@@ -1,0 +1,351 @@
+@import "tailwindcss";
+
+@theme {
+  --color-zk-bg: #070f22;
+  --color-zk-surface: #0e1a33;
+  --color-zk-border: #22324f;
+  --color-zk-divider: #1a2844;
+  --color-zk-chip: #1b2a47;
+  --color-zk-seg: #0a1530;
+  --color-zk-tint: #15284a;
+  --color-zk-text: #e8eef9;
+  --color-zk-text2: #b7c3da;
+  --color-zk-muted: #93a0b8;
+  --color-zk-accent: #8fc9ff;
+  --color-zk-accent-strong: #38a3ff;
+  --color-electric-blue: #3978f6;
+  --color-electric-blue-strong: #2e6fef;
+  --color-zk-info-bg: #14294f;
+  --color-zk-info-fg: #9cc2ff;
+  --color-zk-ok-bg: #0f3326;
+  --color-zk-ok-fg: #6ee7a8;
+  --color-zk-warn-bg: #3a2c0c;
+  --color-zk-warn-fg: #f6cf6b;
+  --color-zk-warn-bd: #6b5216;
+  --color-zk-bad-bg: #3a1517;
+  --color-zk-bad-fg: #fca5a0;
+  --color-zk-bad-bd: #6b2a27;
+  --color-zk-bad-soft: #2a1416;
+  --font-sans: "Inter Variable", Inter, ui-sans-serif, system-ui, sans-serif;
+  --radius-card: 20px;
+}
+
+@layer base {
+  html {
+    color-scheme: dark;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    min-height: 100vh;
+    background-color: var(--color-zk-bg);
+    color: var(--color-zk-text);
+    font-family: var(--font-sans);
+    font-size: 16px;
+    font-feature-settings: "cv11", "ss01";
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  ::selection {
+    background: color-mix(in srgb, var(--color-electric-blue) 45%, transparent);
+    color: #fff;
+  }
+
+  :where(a, button, input, textarea, select, summary):focus-visible {
+    outline: 2px solid color-mix(in srgb, var(--color-electric-blue) 75%, transparent);
+    outline-offset: 2px;
+  }
+
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-zk-border) transparent;
+  }
+}
+
+@layer components {
+  .zk-card {
+    border: 1px solid var(--color-zk-border);
+    border-radius: var(--radius-card);
+    background-color: var(--color-zk-surface);
+  }
+
+  .zk-card:target {
+    border-color: color-mix(
+      in srgb,
+      var(--color-electric-blue) 65%,
+      var(--color-zk-border)
+    );
+    box-shadow: 0 0 0 3px
+      color-mix(in srgb, var(--color-electric-blue) 22%, transparent);
+  }
+
+  .zk-card-interactive {
+    transition:
+      border-color 180ms ease,
+      background-color 180ms ease;
+  }
+
+  .zk-card-interactive:hover {
+    border-color: #324b74;
+    background-color: #10203d;
+  }
+
+  .zk-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.45rem;
+    height: 2.5rem;
+    padding-inline: 1rem;
+    border: 1px solid transparent;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1;
+    white-space: nowrap;
+    cursor: pointer;
+    transition:
+      background-color 160ms ease,
+      border-color 160ms ease,
+      color 160ms ease,
+      opacity 160ms ease;
+  }
+
+  .zk-btn:disabled {
+    cursor: not-allowed;
+    opacity: 0.45;
+  }
+
+  .zk-btn-sm {
+    height: 2.125rem;
+    padding-inline: 0.813rem;
+    font-size: 12px;
+  }
+
+  .zk-btn-xs {
+    height: 1.75rem;
+    padding-inline: 0.625rem;
+    font-size: 11px;
+  }
+
+  .zk-btn-primary {
+    background-color: var(--color-electric-blue-strong);
+    border-color: var(--color-electric-blue-strong);
+    color: #fff;
+  }
+
+  .zk-btn-primary:hover:not(:disabled) {
+    background-color: var(--color-electric-blue);
+    border-color: var(--color-electric-blue);
+  }
+
+  .zk-btn-secondary {
+    background-color: var(--color-zk-surface);
+    border-color: var(--color-zk-border);
+    color: var(--color-zk-text);
+  }
+
+  .zk-btn-secondary:hover:not(:disabled) {
+    background-color: var(--color-zk-chip);
+    border-color: #324b74;
+  }
+
+  .zk-btn-ghost {
+    background-color: transparent;
+    color: var(--color-zk-text2);
+  }
+
+  .zk-btn-ghost:hover:not(:disabled) {
+    background-color: var(--color-zk-chip);
+    color: var(--color-zk-text);
+  }
+
+  .zk-btn-danger {
+    background-color: var(--color-zk-bad-soft);
+    border-color: var(--color-zk-bad-bd);
+    color: var(--color-zk-bad-fg);
+  }
+
+  .zk-btn-danger:hover:not(:disabled) {
+    background-color: var(--color-zk-bad-bg);
+  }
+
+  .zk-input {
+    width: 100%;
+    height: 2.5rem;
+    padding-inline: 1rem;
+    border: 1px solid var(--color-zk-border);
+    border-radius: 999px;
+    background-color: var(--color-zk-seg);
+    color: var(--color-zk-text);
+    font-size: 13px;
+  }
+
+  .zk-input::placeholder {
+    color: var(--color-zk-muted);
+  }
+
+  .zk-textarea {
+    width: 100%;
+    min-height: 5.5rem;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--color-zk-border);
+    border-radius: 16px;
+    background-color: var(--color-zk-seg);
+    color: var(--color-zk-text);
+    font-size: 13px;
+    line-height: 1.55;
+    resize: vertical;
+  }
+
+  .zk-textarea::placeholder {
+    color: var(--color-zk-muted);
+  }
+
+  .zk-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.07em;
+    line-height: 1.2;
+    text-transform: uppercase;
+    color: var(--color-zk-muted);
+  }
+
+  .zk-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    min-height: 1.5rem;
+    padding: 0.2rem 0.625rem;
+    border: 1px solid var(--color-zk-border);
+    border-radius: 999px;
+    background-color: var(--color-zk-chip);
+    color: var(--color-zk-text2);
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1.2;
+    white-space: nowrap;
+  }
+
+  .zk-chip-info {
+    background-color: var(--color-zk-info-bg);
+    border-color: #294a7f;
+    color: var(--color-zk-info-fg);
+  }
+
+  .zk-chip-ok {
+    background-color: var(--color-zk-ok-bg);
+    border-color: #1d5a40;
+    color: var(--color-zk-ok-fg);
+  }
+
+  .zk-chip-warn {
+    background-color: var(--color-zk-warn-bg);
+    border-color: var(--color-zk-warn-bd);
+    color: var(--color-zk-warn-fg);
+  }
+
+  .zk-chip-bad {
+    background-color: var(--color-zk-bad-bg);
+    border-color: var(--color-zk-bad-bd);
+    color: var(--color-zk-bad-fg);
+  }
+
+  .zk-chip-accent {
+    background-color: color-mix(in srgb, var(--color-electric-blue) 16%, transparent);
+    border-color: color-mix(in srgb, var(--color-electric-blue) 42%, transparent);
+    color: #cfe0ff;
+  }
+
+  .zk-avatar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 2.5rem;
+    height: 2.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    color: #fff;
+  }
+
+  .zk-dialog {
+    width: min(28rem, calc(100vw - 2rem));
+    margin: auto;
+    padding: 1.25rem;
+    border: 1px solid var(--color-zk-border);
+    border-radius: 20px;
+    background-color: var(--color-zk-surface);
+    color: var(--color-zk-text);
+  }
+
+  .zk-dialog::backdrop {
+    background-color: rgba(3, 8, 18, 0.72);
+  }
+
+  .zk-skeleton {
+    border-radius: 0.75rem;
+    background: linear-gradient(
+      90deg,
+      #0e1a33 25%,
+      #15284a 37%,
+      #0e1a33 63%
+    );
+    background-size: 400% 100%;
+    animation: zk-shimmer 1.4s ease infinite;
+  }
+
+  .zk-motion {
+    transition:
+      opacity 180ms ease,
+      transform 180ms ease,
+      background-color 180ms ease,
+      border-color 180ms ease;
+  }
+
+  .zk-rise {
+    animation: zk-rise 240ms cubic-bezier(0.2, 0.7, 0.3, 1) both;
+  }
+
+  .zk-popover {
+    border: 1px solid var(--color-zk-border);
+    border-radius: 20px;
+    background-color: var(--color-zk-surface);
+    box-shadow: 0 24px 60px rgba(2, 7, 18, 0.55);
+  }
+}
+
+@keyframes zk-shimmer {
+  0% {
+    background-position: 100% 0;
+  }
+  100% {
+    background-position: -100% 0;
+  }
+}
+
+@keyframes zk-rise {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
