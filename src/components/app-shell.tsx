@@ -40,12 +40,13 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               Today
             </Link>
 
-            {ready && needsCount > 0 ? (
+            {/* The board already leads with this count; only offer the jump elsewhere. */}
+            {ready && needsCount > 0 && pathname !== "/" ? (
               <Link
-                href="/#waiting"
+                href="/#need"
                 className="zk-chip zk-chip-warn hidden sm:inline-flex"
               >
-                {needsCount} waiting on you
+                {needsCount} {needsCount === 1 ? "needs" : "need"} you
               </Link>
             ) : null}
 

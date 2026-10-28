@@ -1,71 +1,24 @@
 "use client";
 
 import { useState } from "react";
-import {
-  AlertTriangle,
-  ArrowUpRight,
-  HelpCircle,
-  Info,
-  Mail,
-  ShieldCheck,
-} from "lucide-react";
+import { ArrowUpRight, Info } from "lucide-react";
 import { useDemo } from "@/lib/demo-store";
 import { formatDuration, formatRelative } from "@/lib/format";
 import type { NeedAction, NeedItem } from "@/lib/types";
-import { cn } from "@/lib/cn";
 import {
-  AgentIdentity,
-  Badge,
-  IssueLink,
-  PresenceBadge,
-  TimeMeter,
-} from "./ui";
+  ANSWER_SUGGESTIONS,
+  pendingAction,
+  type PendingAction,
+} from "@/lib/need-copy";
+import { cn } from "@/lib/cn";
+import { AgentAvatar, Badge, PresenceBadge, TimeMeter } from "./ui";
 import { ConfirmDialog } from "./confirm-dialog";
 
 const KIND_META = {
-  question: {
-    label: "Question",
-    icon: HelpCircle,
-    iconClass: "bg-zk-info-bg text-zk-info-fg",
-    tone: "info" as const,
-  },
-  offer: {
-    label: "Offer",
-    icon: Mail,
-    iconClass: "bg-zk-warn-bg text-zk-warn-fg",
-    tone: "warn" as const,
-  },
-  approval: {
-    label: "Pipeline gate",
-    icon: ShieldCheck,
-    iconClass: "bg-zk-info-bg text-zk-info-fg",
-    tone: "info" as const,
-  },
-  claim: {
-    label: "Stale claim",
-    icon: AlertTriangle,
-    iconClass: "bg-zk-bad-bg text-zk-bad-fg",
-    tone: "bad" as const,
-  },
-};
-
-type PendingAction = {
-  action: NeedAction;
-  title: string;
-  body: string;
-  confirmLabel: string;
-  tone: "primary" | "danger";
-};
-
-const ANSWER_SUGGESTIONS: Record<number, string[]> = {
-  1149: [
-    "Keep the existing agent-card header",
-    "Use the compact lower-fidelity variant",
-  ],
-  141: [
-    "Escalate to a merger",
-    "Request a third independent review",
-  ],
+  question: { label: "Question", tone: "info" as const },
+  offer: { label: "Offer", tone: "warn" as const },
+  approval: { label: "Pipeline gate", tone: "info" as const },
+  claim: { label: "Stale claim", tone: "bad" as const },
 };
 
 export function NeedCard({ need }: { need: NeedItem }) {
@@ -81,7 +34,6 @@ export function NeedCard({ need }: { need: NeedItem }) {
       candidate.issue.number === need.issue.number,
   );
   const meta = KIND_META[need.kind];
-  const Icon = meta.icon;
   const expired = need.status === "expired";
 
   if (!agent) return null;
@@ -92,65 +44,8 @@ export function NeedCard({ need }: { need: NeedItem }) {
       ? claim?.deadline
       : (need.expiresAt ?? need.claimReleaseAt);
 
-  const openConfirm = (action: NeedAction) => {
-    if (action === "accept") {
-      setPending({
-        action,
-        title: `Accept the offer for #${need.issue.number}?`,
-        body: "Accepting starts a delivery window for this agent and ends the offer for everyone else. High and critical issues get at least 60 minutes; other issues get 15.",
-        confirmLabel: "Accept offer",
-        tone: "primary",
-      });
-    } else if (action === "pass") {
-      setPending({
-        action,
-        title: `Pass on #${need.issue.number}?`,
-        body: "This offer ends and the issue is re-offered to the next eligible person. The agent is notified.",
-        confirmLabel: "Pass offer",
-        tone: "primary",
-      });
-    } else if (action === "release") {
-      setPending({
-        action,
-        title: `Release the claim on #${need.issue.number}?`,
-        body: "The issue becomes available for a new offer immediately. The agent loses this claim and is notified.",
-        confirmLabel: "Release claim",
-        tone: "danger",
-      });
-    } else if (action === "extend") {
-      setPending({
-        action,
-        title: "Extend the deadline by 60 minutes?",
-        body: "Only one extension is available for a claim. Heartbeats still do not move deliverBy, so this buys time without proving the agent is online.",
-        confirmLabel: "Extend 60m",
-        tone: "primary",
-      });
-    } else if (action === "approve") {
-      setPending({
-        action,
-        title: `Approve the production gate for #${need.issue.number}?`,
-        body: "Approval is recorded and may automatically resume the paused merge. The decision is attributed to you as workspace owner.",
-        confirmLabel: "Approve gate",
-        tone: "primary",
-      });
-    } else if (action === "decline") {
-      setPending({
-        action,
-        title: `Decline the production gate for #${need.issue.number}?`,
-        body: "The merge stays blocked and the agent is notified. You can revisit the decision from the issue history.",
-        confirmLabel: "Decline gate",
-        tone: "danger",
-      });
-    } else if (action === "reoffer") {
-      setPending({
-        action,
-        title: `Re-offer #${need.issue.number}?`,
-        body: "Dispatch will pick the next eligible person. The expired offer never started a claim, so nothing is released.",
-        confirmLabel: "Request re-offer",
-        tone: "primary",
-      });
-    }
-  };
+  const openConfirm = (action: Exclude<NeedAction, "answer">) =>
+    setPending(pendingAction(need, action));
 
   return (
     <article
@@ -161,16 +56,13 @@ export function NeedCard({ need }: { need: NeedItem }) {
       )}
     >
       <div className="flex flex-wrap items-center gap-x-2.5 gap-y-2 border-b border-zk-divider px-4 py-3 sm:px-5">
-        <span
-          className={cn(
-            "inline-flex h-8 w-8 items-center justify-center rounded-full",
-            meta.iconClass,
-          )}
-        >
-          <Icon className="h-4 w-4" aria-hidden="true" />
-        </span>
         <Badge tone={expired ? "warn" : meta.tone}>{meta.label}</Badge>
-        <AgentIdentity agent={agent} compact />
+        <span className="flex min-w-0 items-center gap-2">
+          <AgentAvatar agent={agent} size="sm" />
+          <span className="truncate text-sm font-semibold text-zk-text">
+            {agent.name}
+          </span>
+        </span>
         <div className="ml-auto flex flex-wrap items-center gap-1.5">
           <PresenceBadge agent={agent} />
           {expired ? (
@@ -192,20 +84,7 @@ export function NeedCard({ need }: { need: NeedItem }) {
       </div>
 
       <div className="p-4 sm:p-5">
-        <div className="flex flex-wrap items-center gap-2">
-          <IssueLink issue={need.issue} />
-          <Badge
-            tone={
-              need.issue.priority === "High" || need.issue.priority === "Critical"
-                ? "bad"
-                : "neutral"
-            }
-          >
-            {need.issue.priority}
-          </Badge>
-        </div>
-
-        <h3 className="mt-2 text-[15px] font-bold leading-snug tracking-[-0.01em] text-zk-text">
+        <h3 className="text-[17px] font-bold leading-snug tracking-[-0.02em] text-zk-text">
           {need.title}
         </h3>
         <p className="mt-1.5 max-w-3xl text-[13px] leading-relaxed text-zk-text2">

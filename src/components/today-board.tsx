@@ -1,26 +1,25 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo } from "react";
 import { useDemo } from "@/lib/demo-store";
-import {
-  buildBoard,
-  buildBrief,
-  buildOrbs,
-  type BoardCard,
-} from "@/lib/board";
+import { buildBoard, type BoardCard } from "@/lib/board";
 import { readLastSeen, writeLastSeen } from "@/lib/last-seen";
+import { cn } from "@/lib/cn";
 import { PageSkeleton } from "./ui";
-import { TodayBrief } from "./today-brief";
-import { AgentStrip } from "./agent-strip";
-import { BoardRail } from "./board-rail";
+import { FocusCard } from "./focus-card";
+import { QueueRow } from "./queue-row";
+
+type Group = {
+  id: string;
+  title: string;
+  dot: string;
+  empty: string;
+  cards: BoardCard[];
+};
 
 export function TodayBoard() {
   const { ready, state, now } = useDemo();
-  const [filter, setFilter] = useState<string | null>(null);
-  const sinceRef = useRef<{ from: number; label: string } | null>(null);
-
-  if (!sinceRef.current) sinceRef.current = readLastSeen(Date.now());
-  const since = sinceRef.current;
+  const since = useMemo(() => readLastSeen(Date.now()), []);
 
   useEffect(() => {
     writeLastSeen(Date.now());
@@ -31,83 +30,99 @@ export function TodayBoard() {
     [state, now],
   );
 
-  if (!ready || !board || !state) return <PageSkeleton rows={4} />;
+  if (!ready || !board || !state) return <PageSkeleton rows={5} />;
 
-  const lines = buildBrief(board, state, now, since);
-  const orbs = buildOrbs(board, state, now);
-
-  const inFilter = (cards: BoardCard[]) =>
-    filter ? cards.filter((card) => card.agent?.id === filter) : cards;
+  const lead = board.waiting[0];
+  const groups: Group[] = [
+    {
+      id: "need",
+      title: "Need you",
+      dot: "bg-zk-warn-fg",
+      empty: "Nothing is waiting on a decision.",
+      cards: board.waiting.slice(1),
+    },
+    {
+      id: "running",
+      title: "Running",
+      dot: "bg-zk-info-fg",
+      empty: "No agent holds a claim right now.",
+      cards: board.running,
+    },
+    {
+      id: "shipped",
+      title: "Shipped",
+      dot: "bg-zk-ok-fg",
+      empty: "Nothing has landed in this workspace yet.",
+      cards: board.shipped,
+    },
+  ];
 
   const todayLabel = new Intl.DateTimeFormat("en-US", {
-    weekday: "long",
-    month: "long",
+    weekday: "short",
+    month: "short",
     day: "numeric",
   }).format(now);
 
   return (
-    <div className="space-y-4">
-      <header className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-        <h1 className="text-[24px] font-bold leading-tight tracking-[-0.02em] text-zk-text sm:text-[26px]">
-          Today
-        </h1>
-        <p className="text-[12px] text-zk-muted">
-          {todayLabel} · Zedu workspace
+    <div className="mx-auto max-w-[56rem] space-y-9">
+      <header className="flex flex-wrap items-end justify-between gap-x-6 gap-y-3">
+        <div>
+          <h1 className="text-[34px] font-bold leading-none tracking-[-0.035em] text-zk-text sm:text-[42px]">
+            Today
+          </h1>
+          <p className="mt-2.5 text-[12px] text-zk-muted">
+            {todayLabel} · Zedu
+          </p>
+        </div>
+        <p className="flex items-baseline gap-1.5">
+          <span className="text-[26px] font-bold leading-none tabular-nums tracking-[-0.03em] text-zk-text">
+            {board.waiting.length}
+          </span>
+          <span className="text-[12px] text-zk-muted">
+            need{board.waiting.length === 1 ? "s" : ""} you
+          </span>
         </p>
       </header>
 
-      <TodayBrief lines={lines} />
+      {lead ? (
+        <FocusCard card={lead} />
+      ) : (
+        <div className="zk-card px-5 py-6 sm:px-8">
+          <p className="text-[21px] font-bold leading-tight tracking-[-0.02em] text-zk-text">
+            All clear
+          </p>
+          <p className="mt-1.5 text-[13px] text-zk-muted">
+            No agent is blocked on you.
+          </p>
+        </div>
+      )}
 
-      <AgentStrip
-        orbs={orbs}
-        now={now}
-        filter={filter}
-        onFilter={(agentId) =>
-          setFilter((current) => (current === agentId ? null : agentId))
-        }
-      />
+      {groups.map((group) => (
+        <section key={group.id} id={group.id} className="scroll-mt-24">
+          <h2 className="flex items-center gap-2">
+            <span className={cn("h-1.5 w-1.5 rounded-full", group.dot)} aria-hidden="true" />
+            <span className="zk-label">{group.title}</span>
+            <span className="text-[11px] font-semibold tabular-nums text-zk-muted">
+              {group.cards.length}
+            </span>
+          </h2>
 
-      <div className="grid gap-4 lg:grid-cols-3 lg:items-start">
-        <BoardRail
-          id="waiting"
-          title="Waiting on you"
-          meaning="Nothing moves until you decide"
-          spine="--zk-warn-bd"
-          cards={inFilter(board.waiting)}
-          emptyText="No decisions outstanding. Agents put a card here when they need a human."
-          now={now}
-          agentFilter={filter}
-          onAgentSelect={(agentId) =>
-            setFilter((current) => (current === agentId ? null : agentId))
-          }
-        />
-        <BoardRail
-          id="running"
-          title="In progress"
-          meaning="Agents are working; no action needed"
-          spine="--zk-info-bd"
-          cards={inFilter(board.running)}
-          emptyText="No claims are running. Accepted offers and released claims land here first."
-          now={now}
-          agentFilter={filter}
-          onAgentSelect={(agentId) =>
-            setFilter((current) => (current === agentId ? null : agentId))
-          }
-        />
-        <BoardRail
-          id="shipped"
-          title="Shipped"
-          meaning="Done, merged or delivered"
-          spine="--zk-ok-bd"
-          cards={inFilter(board.shipped)}
-          emptyText="Nothing has landed in this workspace yet."
-          now={now}
-          agentFilter={filter}
-          onAgentSelect={(agentId) =>
-            setFilter((current) => (current === agentId ? null : agentId))
-          }
-        />
-      </div>
+          {group.cards.length > 0 ? (
+            <ul className="mt-2">
+              {group.cards.map((card) => (
+                <QueueRow
+                  key={card.key}
+                  card={card}
+                  now={now}
+                  isNew={since !== null && card.at >= since}
+                />
+              ))}
+            </ul>
+          ) : (
+            <p className="mt-2 text-[13px] text-zk-muted">{group.empty}</p>
+          )}
+        </section>
+      ))}
     </div>
   );
 }

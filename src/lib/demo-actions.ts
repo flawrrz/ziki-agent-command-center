@@ -137,7 +137,7 @@ export function applyNeedAction(
         return {
           ...claim,
           status: "active" as const,
-          latestLabel: "Answer received · claim resumed",
+          latestLabel: "Resuming after your answer",
           updatedAt: at,
           nextStep: "Waiting on the agent's next heartbeat",
           nextStepTone: "info" as const,
@@ -187,7 +187,7 @@ export function applyNeedAction(
             ? {
                 ...claim,
                 status: "active" as const,
-                latestLabel: "Offer accepted · delivery window started",
+                latestLabel: "Working the accepted offer",
                 updatedAt: at,
                 deadline,
                 nextStep: "Link a fix before the delivery deadline",

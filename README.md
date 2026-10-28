@@ -2,59 +2,58 @@
 
 An interactive, high-fidelity prototype of a clearer human–agent operations surface for Ziki, built from a review of the live Dashboard and Settings → Agents pages.
 
-The first version of this prototype had four routes and a lot of vocabulary. The feedback was that it was **too complicated to read**. This version answers two questions on one screen, in the words an owner would use:
+The first version had four routes and a lot of vocabulary. The second had a written brief, agent orbs and three rails. Both were judged **too busy**: too much text, and unclear what to do first.
 
-- What are my agents doing, and what happens if I do nothing?
-- Which single decision is mine right now?
+This version is a **focus queue**. One decision is put in front of you at reading size; every other item is a single line with a clock. There is nothing to filter, expand or interpret.
 
-Everything else — issue numbers, models, event chains, exact timestamps — is one click away on the issue page instead of on the surface.
+- **What is mine right now?** The card at the top, with one countdown and one or two verbs.
+- **What else is going on?** Ten one-line rows. Issue number, a few words, time left.
+
+Everything else — the consequence sentences, the applicable rule, the event chain, models and exact timestamps — is on the issue page, one click away.
 
 > This is an independent design prototype. It uses illustrative mock data only. It is not connected to Ziki, contains no credentials, and makes no requests to Ziki APIs.
 
 ## The design
 
-### 1. A written brief, not four stat cards
+### 1. One focus card
 
-The page opens with three generated sentences: how many decisions are waiting and which one is most urgent, what shipped since you last opened the page, and what is running with its own delivery time. Numbers never appear without a verb attached.
+The most urgent waiting item is the only thing on the page rendered at reading size: the kind of ask, its priority, a full-sentence title, and a **30px+ countdown** with the unit written next to it (`1h 35m past deliverBy`, `12m left before the offer lapses`). Below it sit the verbs that actually resolve it — `Answer`, or `Accept offer` / `Pass`, or `Approve gate` / `Decline`, or `Release claim` / `Extend 60m` — plus a quiet **Open in Ziki**. Destructive verbs confirm first.
 
-> **6 decisions are waiting on you.** Bounty Hunter · #721 — Held 1h 30m past deliverBy.
-> Reviewer **shipped 1 accepted fix** in the last 12 hours.
-> **2 claims in progress:** #655 delivers in 22m, #662 delivers in 1h 36m.
+The title is the whole promise: the detail sentence, the rule and the event chain are deliberately *not* on the surface.
 
-The "since you last looked" window is real: the last visit is stored per browser, so returning to the app tells you what you missed.
+### 2. One line per remaining item
 
-### 2. Agents as orbs, not a table
+Everything else is a `QueueRow`: avatar, issue number, a few words, a draining ring, a clock.
 
-Each agent is one circle. The ring around it drains as its nearest deadline approaches, the number badge is how many decisions it needs from you, and the word underneath is one of `needs you · working · available · paused`. Clicking an orb filters the whole board to that agent; **Manage** opens a compact panel with level, model, presence rules, lifetime stats, areas and pause/resume.
+| Column | Example |
+| --- | --- |
+| who | 22px agent avatar with a presence dot |
+| where | `#640`, tinted when the priority is High or Critical |
+| what | `offer open` · `needs your answer` · `Writing the patch` · `Claim released at deadline` |
+| how long | ring + `59m`, `3h 42m`, `17m over`, or `2h ago` once shipped |
 
-Presence and work stay separate concepts (an offline agent can still hold a claim), but they are explained in the panel rather than repeated in every row.
+The entire row is one link to the issue page, so there are no nested controls to miss. When you have items you have not seen before this visit, the row carries a small accent dot; the last-visit timestamp is stored per browser, so returning shows what arrived since.
 
-### 3. Three rails, one spine colour each
+### 3. Three groups, no filters
 
-| Rail | Means | Card shows |
-| --- | --- | --- |
-| **Waiting on you** | Nothing moves until a human decides | the ask, one consequence sentence, one verb button |
-| **In progress** | An agent owns it; no action needed | what it is doing now and when it delivers |
-| **Shipped** | Done, merged or delivered | the outcome and whether it was accepted as a fix |
+`Need you` → `Running` → `Shipped`, each headed by a coloured dot and a count. An issue appears once: if it needs a decision it is only under **Need you**, even when a claim exists for it. There is no agent filter, no manage panel and no selection state to explain — the agent's own page is one click away.
 
-An issue appears once: if it needs a decision it lives only in **Waiting on you**, even when a claim exists for it.
+### 4. Copy budget: title and clock only
 
-### 4. One verb per decision
+Board rows carry a few words. Sentences live on the drill-down. The consequence of waiting is expressed by the countdown's unit rather than a paragraph, and the same short label is reused in the confirmation dialog so the two never drift.
 
-`question → Answer`, `offer → Accept`, `approval → Approve`, `stale claim → Extend`, `expired offer → Re-offer`. The secondary options (pass, decline, release) live on the issue page, where the rule that applies is quoted next to them. Every card states the consequence of waiting — "Releases #1149 in 3h 48m if unanswered", "Delivery stays blocked · window closes in 1h 5m" — instead of a countdown pill you have to interpret.
+### 5. Drill-down
 
-### 5. Drill-down, not scroll-past
-
-`/issue/721` carries the full action card, the agent's identity and model, the applicable rule, and the claim's event chain with exact timestamps — the detail a developer wants, kept off the surface everyone else sees.
+`/issue/721` carries the decision card in full, the agent's identity, the applicable rule, and the claim's event chain with exact timestamps — the detail a developer wants, kept off the surface everyone else sees.
 
 ## Routes
 
 | Route | Purpose |
 | --- | --- |
-| `/` | Today: the brief, the agent strip and the three rails |
-| `/issue/[number]` | One issue: decision card, claim state, event chain, outcomes |
+| `/` | Today: the focus card and the queue |
+| `/issue/[number]` | One issue: full decision card, claim state, event chain, outcomes |
 
-Deep links used by the UI: `/issue/721`, `/issue/1149#need-…`, `/#waiting`, `/#running`, `/#shipped`.
+Deep links used by the UI: `/issue/721`, `/issue/1149#need-…`, `/#need`, `/#running`, `/#shipped`.
 
 ## Demo behaviour
 
@@ -67,7 +66,7 @@ The simulated rules mirror the live product:
 - Heartbeats within 15 minutes are online; 15–60 minutes idle; over 60 minutes offline.
 - Unanswered questions release a claim after 4 hours.
 
-All actions (answer, accept, pass, approve, decline, release, extend, re-offer, pause/resume) run client-side and update the same shared state, so the brief, the orbs, the rails and the notification tray stay consistent.
+All actions (answer, accept, pass, approve, decline, release, extend, re-offer, pause/resume) run client-side and update the same shared state, so the focus card, the queue and the notification tray stay consistent.
 
 ## Theming
 
@@ -131,19 +130,20 @@ src/
     globals.css              palette, tokens and component classes
     layout.tsx               theme pre-paint, shell, providers
   components/
-    today-board.tsx          composes brief + strip + rails, owns the agent filter
-    today-brief.tsx          the written summary
-    agent-strip.tsx          orbs, filter and manage panel
-    board-rail.tsx           one spine-coloured column
-    work-card.tsx            one issue-level card
+    today-board.tsx          header, focus card and the three groups
+    focus-card.tsx           the one decision, at reading size, with its verbs
+    queue-row.tsx            one-line row: avatar, issue, label, ring, clock
     deadline-ring.tsx        draining SVG ring
     issue-detail.tsx         drill-down view
     need-card.tsx            full action card with confirmations
     notifications.tsx        grouped feed tray
     app-shell.tsx            header, footer, skip link
+    theme-toggle.tsx         light/dark switch
+    toaster.tsx              action feedback
     ui.tsx                   shared primitives
   lib/
-    board.ts                 rails, cards, orbs and the generated brief sentences
+    board.ts                 groups, row labels, card tones and windows
+    need-copy.ts             confirmation copy, shared by card and drill-down
     last-seen.ts             since-last-visit window
     demo-data.ts             seeded workspace and storage keys
     demo-actions.ts          state transitions and live reconciliation
@@ -156,10 +156,10 @@ src/
 
 ## Accessibility and responsiveness
 
-- Skip link, visible focus styles and reduced-motion support.
+- Skip link, visible focus styles and reduced-motion support. There is no ambient animation by design; the only moving element is the countdown ring, and it is decorative.
 - Native `<dialog>` for destructive confirmations.
-- Orbs expose `aria-pressed`, the manage panel exposes `aria-expanded`, rings are decorative (`aria-hidden`) because the consequence sentence carries the same information in words.
-- Layouts checked at 390px and 1280px in both themes with no horizontal overflow; the agent strip scrolls horizontally on small screens.
+- Each row is a single link, so the whole line is one tab stop and one tap target; the clock is real text, not colour alone.
+- Layouts checked at 390px and 1280px in both themes with no horizontal overflow or wrapped clocks; row verbs drop below the `sm` breakpoint so labels stay readable on phones.
 
 ## Scope and limitations
 

@@ -1,39 +1,21 @@
-import { formatDuration } from "./format";
-
 export const LAST_SEEN_KEY = "ziki-agent-command-center:seen";
 
-const FALLBACK_WINDOW = 12 * 60 * 60 * 1000;
-
-export function readLastSeen(now: number): { from: number; label: string } {
-  let raw: string | null = null;
-
+/** Previous visit timestamp, or null when the demo has not been opened before. */
+export function readLastSeen(now: number): number | null {
   try {
-    raw = window.localStorage.getItem(LAST_SEEN_KEY);
+    const stored = Number(window.localStorage.getItem(LAST_SEEN_KEY));
+
+    return Number.isFinite(stored) && stored > 0 && stored <= now ? stored : null;
   } catch {
-    // Private browsing: fall back to a fixed window.
+    // Private browsing: nothing is marked as new.
+    return null;
   }
-
-  const stored = raw ? Number(raw) : Number.NaN;
-
-  if (!Number.isFinite(stored) || stored <= 0 || stored > now) {
-    return { from: now - FALLBACK_WINDOW, label: "in the last 12 hours" };
-  }
-
-  const elapsed = now - stored;
-
-  return {
-    from: stored,
-    label:
-      elapsed < 60_000
-        ? "since you loaded this page"
-        : `in the last ${formatDuration(elapsed)}`,
-  };
 }
 
 export function writeLastSeen(now: number) {
   try {
     window.localStorage.setItem(LAST_SEEN_KEY, String(now));
   } catch {
-    // Private browsing: the brief just stays on the fixed window.
+    // Private browsing: the board simply never marks rows as new.
   }
 }

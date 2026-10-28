@@ -4,7 +4,6 @@ import Link from "next/link";
 import { ArrowLeft, ExternalLink, Info } from "lucide-react";
 import { useDemo } from "@/lib/demo-store";
 import { formatCountdown, formatDateTime, formatRelative } from "@/lib/format";
-import { presenceMeta } from "@/lib/demo-selectors";
 import type { Issue } from "@/lib/types";
 import { cn } from "@/lib/cn";
 import {
@@ -77,7 +76,7 @@ function IssueHeader({
         </a>
       </div>
 
-      <h1 className="max-w-3xl text-[19px] font-bold leading-snug tracking-[-0.015em] text-zk-text sm:text-[21px]">
+      <h1 className="max-w-3xl text-[22px] font-bold leading-[1.2] tracking-[-0.025em] text-zk-text sm:text-[26px]">
         {issue.title}
       </h1>
     </header>
@@ -186,13 +185,13 @@ export function IssueDetail({ number }: { number: number }) {
   const statusLabel = needs.some((need) => need.kind === "claim")
     ? "Claim overdue"
     : needs.length > 0
-      ? "Waiting on you"
+      ? "Needs you"
       : claim
         ? claim.status === "completed"
           ? "Completed"
           : claim.status === "released"
             ? "Claim released"
-            : "Agent is working"
+            : "Running"
         : outcomes.length > 0
           ? "Shipped"
           : "No active work";
@@ -200,7 +199,7 @@ export function IssueDetail({ number }: { number: number }) {
   const statusTone = needs.length > 0 ? "warn" : claim ? "info" : outcomes.length > 0 ? "ok" : "neutral";
 
   return (
-    <div className="space-y-6">
+    <div className="mx-auto max-w-[56rem] space-y-6">
       <IssueHeader issue={issue} statusLabel={statusLabel} statusTone={statusTone} />
 
       {needs.length > 0 ? (
@@ -216,21 +215,6 @@ export function IssueDetail({ number }: { number: number }) {
           {claim ? ` ${claim.nextStep}.` : ""}
         </p>
       )}
-
-      {agent && needs.length > 0 ? (
-        <p className="zk-inset rounded-card px-4 py-3 text-[11.5px] leading-relaxed text-zk-muted">
-          {agent.name} · {agent.model} · {presenceMeta(agent).label}
-          {claim ? (
-            <>
-              {" · "}
-              {claim.latestLabel}. {claim.nextStep}.
-            </>
-          ) : null}
-          {claim?.deadline
-            ? ` DeliverBy ${formatDateTime(claim.deadline)} (${formatCountdown(claim.deadline, now)}).`
-            : ""}
-        </p>
-      ) : null}
 
       {agent && needs.length === 0 ? (
         <section className="zk-card p-4">
@@ -288,8 +272,7 @@ export function IssueDetail({ number }: { number: number }) {
         )}
       </section>
 
-      <p className="border-t border-zk-border pt-4 text-[11px] text-zk-muted">
-        Looking for the other issues your agents touched?{" "}
+      <p className="border-t border-zk-border pt-4 text-[12px]">
         <Link href="/" className="font-semibold text-zk-accent">
           Back to the board
         </Link>
