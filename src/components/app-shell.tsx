@@ -38,7 +38,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               )}
               aria-current={pathname === "/" ? "page" : undefined}
             >
-              Dispatch
+              Dashboard
             </Link>
 
             {/* The board already leads with this count; only offer the jump elsewhere. */}

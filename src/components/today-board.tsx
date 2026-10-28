@@ -118,7 +118,7 @@ export function TodayBoard() {
     <div className="mx-auto max-w-[72rem] space-y-7">
       <header className="flex flex-wrap items-end justify-between gap-x-6 gap-y-3">
         <div>
-          <h1 className="zk-label text-zk-accent">Zedu dispatch</h1>
+          <h1 className="zk-label text-zk-accent">Zedu issues</h1>
           <p className="zk-num mt-1.5 text-[12px] text-zk-muted">
             {new Intl.DateTimeFormat("en-GB", {
               weekday: "short",

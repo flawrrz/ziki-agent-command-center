@@ -75,7 +75,7 @@ The simulated rules mirror the live product: offers expire after 30 minutes, acc
 
 | Route | Purpose |
 | --- | --- |
-| `/` | Dispatch: ledger, focus card, three bounded queues, the field |
+| `/` | Dashboard: ledger, focus card, three bounded queues, the field |
 | `/issue/[number]` | One issue: decision card, claim with checkpoint readout, event chain, neighbours |
 
 The eleven hand-written issues prerender; the generated tail renders on demand. Prev/next links in the drill-down walk the field in the same order the grid draws it, so you can read the backlog without returning to the board.

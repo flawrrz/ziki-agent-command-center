@@ -50,7 +50,7 @@ function IssueHeader({
         className="inline-flex items-center gap-1.5 text-[12px] font-semibold text-zk-muted transition hover:text-zk-text"
       >
         <ArrowLeft className="h-3.5 w-3.5" aria-hidden="true" />
-        Back to dispatch
+        Back to dashboard
       </Link>
 
       <div className="flex flex-wrap items-center gap-2">
@@ -317,7 +317,7 @@ export function IssueDetail({ number }: { number: number }) {
             href="/"
             className="text-[12px] font-semibold text-zk-accent hover:underline"
           >
-            ← Back to dispatch
+            ← Back to dashboard
           </Link>
         )}
 
