@@ -22,7 +22,7 @@ A list is only a good list while it is short. At 991 issues the honest options a
 
 ### 1. Ledger
 
-Seven hairline cells across the top — `NEED YOU 40 · PAST DUE 15 · RUNNING 83 · DELIVERED 296 · RELEASED 173 · NO AGENT 373 · BACKLOG 991` — each a link to the section that holds those rows. The counts cover the whole backlog, not the slice on screen, and they are derived from the same selector that draws the field, so a number and its cells can never disagree.
+Seven hairline cells across the top — `NEED YOU 40 · PAST DUE 15 · RUNNING 94 · DELIVERED 296 · RELEASED 173 · NO AGENT 373 · BACKLOG 991` — each a link to the section that holds those rows. Every cell counts **issues**, never requests or claims, so the six state cells always sum to the seventh; `NEED YOU` is the number of issues waiting on a human, not the number of asks on them. The counts cover the whole backlog, not the slice on screen, and they come from the same one-per-issue selector that draws the field, so a number and its cells can never disagree.
 
 ### 2. Bounded queues
 

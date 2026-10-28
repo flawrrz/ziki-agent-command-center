@@ -200,6 +200,22 @@ export function expiredNeeds(state: DemoState): NeedItem[] {
     .sort((a, b) => b.createdAt - a.createdAt);
 }
 
+/**
+ * Live requests, at most one per issue. An issue can hold both an open ask and
+ * an expired offer, but the queue, the ledger and the field all describe issues,
+ * so counting requests here would break the "an issue appears once" rule and stop
+ * the ledger from summing to the total.
+ */
+export function liveNeeds(state: DemoState): NeedItem[] {
+  const byIssue = new Map<number, NeedItem>();
+
+  for (const need of [...unresolvedNeeds(state), ...expiredNeeds(state)]) {
+    if (!byIssue.has(need.issue.number)) byIssue.set(need.issue.number, need);
+  }
+
+  return [...byIssue.values()];
+}
+
 export function resolvedNeeds(state: DemoState): NeedItem[] {
   return state.needs
     .filter((need) => need.status === "resolved" && need.resolution)

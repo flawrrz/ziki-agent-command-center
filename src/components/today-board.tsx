@@ -85,7 +85,12 @@ export function TodayBoard() {
   if (!ready || !board || !state || !field) return <PageSkeleton rows={5} />;
 
   const lead = board.waiting[0];
-  const oldest = board.waiting[board.waiting.length - 1];
+  /* The queue is sorted by urgency, so its last row is the least urgent, not the
+     longest wait. The ledger's hint has to measure the wait itself. */
+  const oldest = board.waiting.reduce<BoardCard | null>(
+    (soonest, card) => (soonest === null || card.at < soonest.at ? card : soonest),
+    null,
+  );
 
   const sections = [
     {

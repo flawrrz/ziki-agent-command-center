@@ -27,6 +27,7 @@ import {
   agentClaims,
   buildFeed,
   expiredNeeds,
+  liveNeeds,
   needsForAgent,
   resolvedNeeds,
   unresolvedNeeds,
@@ -206,6 +207,7 @@ export function DemoProvider({ children }: { children: React.ReactNode }) {
     () => (state ? resolvedNeeds(state) : []),
     [state],
   );
+  const live = useMemo(() => (state ? liveNeeds(state) : []), [state]);
 
   const markAllRead = useCallback(() => {
     if (!state) return;
@@ -240,7 +242,7 @@ export function DemoProvider({ children }: { children: React.ReactNode }) {
       feed,
       field,
       unreadCount: feed.filter((item) => item.unread).length,
-      needsCount: openNeeds.length + expired.length,
+      needsCount: live.length,
       getAgent: (id: string) => agents.find((agent) => agent.id === id),
       getAgentClaims: (id: string) => agentClaims(claims, id),
       getAgentNeeds: (id: string) =>
@@ -257,6 +259,7 @@ export function DemoProvider({ children }: { children: React.ReactNode }) {
       expired,
       feed,
       field,
+      live,
       markAllRead,
       markRead,
       now,

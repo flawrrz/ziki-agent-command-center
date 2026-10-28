@@ -1,4 +1,4 @@
-import { sortOpenNeeds } from "./demo-selectors";
+import { liveNeeds } from "./demo-selectors";
 import { BACKLOG_ISSUES } from "./backlog";
 import { ISSUES } from "./demo-data";
 import type {
@@ -183,19 +183,12 @@ function latestClaimByIssue(state: DemoState): Map<number, Claim> {
 }
 
 export function buildBoard(state: DemoState, now: number): Board {
-  const open = sortOpenNeeds(state.needs);
-  const waiting = [
-    ...open.map((need) => waitingCard(need, state.agents, state.claims, now)),
-    ...state.needs
-      .filter((need) => need.status === "expired")
-      .map((need) => waitingCard(need, state.agents, state.claims, now)),
-  ];
-
-  const waitingIssues = new Set(
-    [...open, ...state.needs.filter((need) => need.status === "expired")].map(
-      (need) => need.issue.number,
-    ),
+  const live = liveNeeds(state);
+  const waiting = live.map((need) =>
+    waitingCard(need, state.agents, state.claims, now),
   );
+
+  const waitingIssues = new Set(live.map((need) => need.issue.number));
 
   const latest = latestClaimByIssue(state);
 
@@ -262,13 +255,11 @@ const CELL_ORDER: CellState[] = [
  * on first, so a truncated grid never hides a decision behind history.
  */
 export function buildField(state: DemoState): Field {
-  const byIssue = new Map<number, NeedItem>();
-  for (const need of state.needs) {
-    if (need.status === "expired" && byIssue.has(need.issue.number)) continue;
-    if (need.status === "open" || need.status === "expired") {
-      byIssue.set(need.issue.number, need);
-    }
-  }
+  /* The same one-per-issue pick the queue uses, so a cell never describes a
+     different need than the row for that issue. */
+  const byIssue = new Map(
+    liveNeeds(state).map((need) => [need.issue.number, need]),
+  );
 
   const claimByIssue = latestClaimByIssue(state);
 
