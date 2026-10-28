@@ -236,7 +236,7 @@ export function DemoProvider({ children }: { children: React.ReactNode }) {
       outcomes,
       feed,
       unreadCount: feed.filter((item) => item.unread).length,
-      needsCount: openNeeds.length,
+      needsCount: openNeeds.length + expired.length,
       getAgent: (id: string) => agents.find((agent) => agent.id === id),
       getAgentClaims: (id: string) => agentClaims(claims, id),
       getAgentNeeds: (id: string) =>

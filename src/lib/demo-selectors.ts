@@ -112,7 +112,7 @@ export function presenceMeta(agent: Agent): PresenceMeta {
 
 export function buildFeed(state: DemoState): FeedItem[] {
   const needItems: FeedItem[] = state.needs
-    .filter((need) => need.status === "open")
+    .filter((need) => need.status !== "resolved")
     .map((need) => {
       const agent = state.agents.find((candidate) => candidate.id === need.agentId);
 
@@ -127,7 +127,7 @@ export function buildFeed(state: DemoState): FeedItem[] {
         at: need.createdAt,
         needsYou: true,
         expiresAt: need.expiresAt,
-        href: `/needs-you#${need.id}`,
+        href: `/issue/${need.issue.number}#${need.id}`,
         unread: !state.readNotificationIds.includes(`feed-${need.id}`),
       };
     });
@@ -142,7 +142,7 @@ export function buildFeed(state: DemoState): FeedItem[] {
     detail: update.detail,
     at: update.at,
     needsYou: false,
-    href: `/activity?issue=${update.issue.number}`,
+    href: `/issue/${update.issue.number}`,
     unread: !state.readNotificationIds.includes(`feed-${update.id}`),
   }));
 

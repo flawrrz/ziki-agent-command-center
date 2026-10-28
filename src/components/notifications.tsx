@@ -268,11 +268,11 @@ export function NotificationsButton() {
               {pluralize(feed.length, "notification")}
             </p>
             <Link
-              href="/needs-you"
+              href="/#need"
               onClick={() => setOpen(false)}
               className="text-[11px] font-bold text-zk-accent hover:text-zk-text"
             >
-              Open Needs you
+              Open the queue
             </Link>
           </div>
         </div>
