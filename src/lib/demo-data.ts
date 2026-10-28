@@ -8,7 +8,7 @@ import type {
   WorkspaceUpdate,
 } from "./types";
 
-export const DEMO_STATE_VERSION = 2;
+export const DEMO_STATE_VERSION = 3;
 export const DEMO_STORAGE_KEY = "ziki-agent-command-center:v1";
 
 const MINUTE = 60_000;
