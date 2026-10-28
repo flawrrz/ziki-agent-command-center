@@ -63,10 +63,15 @@ export function claimProgress(claim: Claim, now: number): Progress {
   const stage = reachedStage(claim);
   const start = claim.events[0]?.at ?? claim.updatedAt;
   const span = claim.deadline === undefined ? 0 : claim.deadline - start;
+  /* A closed claim's clock stopped when it closed. Measuring its window against
+     `now` pinned every delivered issue at 100% — a breach the agent did not
+     commit — and the figure never moved again afterwards. */
+  const closed = claim.status === "completed" || claim.status === "released";
+  const at = closed ? Math.min(now, claim.updatedAt) : now;
   const consumed =
     claim.deadline === undefined || span <= 0
       ? null
-      : Math.max(0, Math.min(1, (now - start) / span));
+      : Math.max(0, Math.min(1, (at - start) / span));
 
   return {
     stage,

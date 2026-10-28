@@ -300,7 +300,6 @@ function buildClaims(
         ? "Release the claim or extend by 60 minutes"
         : "Link a fix before the due date",
       nextStepTone: late ? "bad" : "info",
-      cycles: 1 + Math.floor(random() * 3),
       /* A breach means the agent went quiet, so its evidence stops at the due
          date rather than continuing past it. */
       events: chainFor(stage, acceptedAt, late ? deadline - MINUTE : now - MINUTE),
@@ -348,7 +347,6 @@ function buildClaims(
       nextStep: "The issue is back in the dispatch queue",
       nextStepTone: "neutral",
       releaseReason: "deadline",
-      cycles: 1 + Math.floor(random() * 2),
       events: chainFor(2 + Math.floor(random() * 3), at - 80 * MINUTE, at),
     });
   }

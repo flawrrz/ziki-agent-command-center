@@ -268,7 +268,6 @@ function seedClaims(now: number): Claim[] {
       lastHeartbeat: now - 2 * MINUTE,
       nextStep: "Answer Fixit's question to resume the claim",
       nextStepTone: "warn",
-      cycles: 3,
       events: [
         {
           at: now - 6 * DAY,

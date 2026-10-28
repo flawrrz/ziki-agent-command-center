@@ -249,9 +249,6 @@ export function IssueDetail({ number }: { number: number }) {
                 {formatCountdown(claim.deadline, now)}
               </span>
             ) : null}
-            {claim.cycles && claim.cycles > 1 ? (
-              <span>cycle {claim.cycles}</span>
-            ) : null}
           </p>
         </section>
       ) : (
