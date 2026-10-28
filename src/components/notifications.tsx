@@ -58,7 +58,7 @@ export function NotificationsButton() {
         type="button"
         onClick={() => setOpen((value) => !value)}
         className={cn(
-          "relative inline-flex h-[38px] w-[38px] items-center justify-center rounded-full border border-zk-border bg-zk-surface text-zk-text2 transition hover:border-[#324b74] hover:text-zk-text",
+          "relative inline-flex h-[38px] w-[38px] items-center justify-center rounded-full border border-zk-border bg-zk-surface text-zk-text2 transition hover:border-zk-border-strong hover:text-zk-text",
           open && "border-electric-blue/50 text-zk-text",
         )}
         aria-label={
@@ -86,7 +86,7 @@ export function NotificationsButton() {
           <div className="flex items-start justify-between gap-3 border-b border-zk-border px-4 py-3.5">
             <div>
               <div className="flex items-center gap-2">
-                <h2 className="text-sm font-extrabold text-zk-text">
+                <h2 className="text-sm font-bold text-zk-text">
                   Notifications
                 </h2>
                 {unreadCount > 0 ? (
@@ -96,7 +96,7 @@ export function NotificationsButton() {
                 )}
               </div>
               <p className="mt-0.5 text-[11px] text-zk-muted">
-                Grouped by issue · agent and owner shown on every item
+                Grouped by issue
               </p>
             </div>
             <div className="flex items-center gap-1">
@@ -164,7 +164,7 @@ export function NotificationsButton() {
                     : "You're all caught up."}
                 </p>
                 <p className="mt-1 text-[11px] text-zk-muted">
-                  New questions, offers and approvals will appear here.
+                  New requests will appear here.
                 </p>
               </div>
             ) : (
@@ -180,7 +180,7 @@ export function NotificationsButton() {
                       <span className="line-clamp-1">{group.issue.title}</span>
                     </p>
                     {group.needsCount > 0 ? (
-                      <span className="shrink-0 text-[10px] font-bold text-[#f6cf6b]">
+                      <span className="shrink-0 text-[10px] font-bold text-zk-warn-fg">
                         {group.needsCount === 1
                           ? "1 request needs you"
                           : `${group.needsCount} requests need you`}
@@ -198,9 +198,9 @@ export function NotificationsButton() {
                           setOpen(false);
                         }}
                         className={cn(
-                          "block rounded-xl border px-2.5 py-2 transition hover:border-[#324b74]",
+                          "block rounded-xl border px-2.5 py-2 transition hover:border-zk-border-strong",
                           item.needsYou
-                            ? "border-[#2a3f61] bg-zk-seg/70"
+                            ? "border-zk-dashed bg-zk-seg/70"
                             : "border-transparent hover:bg-zk-chip/60",
                           !item.unread && "opacity-70",
                         )}
@@ -224,7 +224,7 @@ export function NotificationsButton() {
                                 {item.actorRole} · {item.ownerName}
                               </span>
                               {item.needsYou ? (
-                                <span className="text-[9px] font-extrabold uppercase tracking-[0.06em] text-[#f6cf6b]">
+                                <span className="text-[9px] font-extrabold uppercase tracking-[0.06em] text-zk-warn-fg">
                                   Needs you
                                 </span>
                               ) : null}
@@ -265,12 +265,12 @@ export function NotificationsButton() {
 
           <div className="flex items-center justify-between gap-2 border-t border-zk-border bg-zk-surface px-4 py-2.5">
             <p className="text-[10px] text-zk-muted">
-              {pluralize(feed.length, "notification")} · demos persist locally
+              {pluralize(feed.length, "notification")}
             </p>
             <Link
               href="/needs-you"
               onClick={() => setOpen(false)}
-              className="text-[11px] font-bold text-zk-accent hover:text-white"
+              className="text-[11px] font-bold text-zk-accent hover:text-zk-text"
             >
               Open Needs you
             </Link>

@@ -4,12 +4,10 @@ import Link from "next/link";
 import {
   AlertTriangle,
   ArrowRight,
-  ArrowUpRight,
   Bot,
   CheckCircle2,
   ChevronRight,
   Inbox,
-  Info,
   Mail,
   ShieldCheck,
   Timer,
@@ -119,7 +117,7 @@ export default function DashboardPage() {
       <PageHeader
         eyebrow={`Zedu · ${todayLabel}`}
         title="Welcome back, Fawaz"
-        description="Presence, current work and attention are tracked separately. See what your agents have done, what is running now, and what still needs a human decision."
+        description="What your agents did, what is running now, and what still needs a decision from you."
         actions={
           <>
             <Link href="/agents" className="zk-btn zk-btn-secondary zk-btn-sm">
@@ -164,25 +162,23 @@ export default function DashboardPage() {
         <StatCard
           label="Accepted fixes"
           value={acceptedFixes}
-          hint="Across all agents · last 30 days"
+          hint="Last 30 days"
           icon={CheckCircle2}
           tone="info"
         />
       </div>
 
       {overdueClaims.length > 0 ? (
-        <div className="flex flex-col gap-3 rounded-[20px] border border-[#6b2a27] bg-[#2a1416]/70 p-4 sm:flex-row sm:items-center">
-          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#3a1517] text-[#fca5a0]">
+        <div className="flex flex-col gap-3 rounded-[20px] border border-zk-bad-bd bg-zk-bad-soft p-4 sm:flex-row sm:items-center">
+          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-zk-bad-bg text-zk-bad-fg">
             <AlertTriangle className="h-4 w-4" aria-hidden="true" />
           </span>
           <div className="min-w-0 flex-1">
-            <p className="text-[13px] font-bold text-[#ffe3e0]">
-              {pluralize(overdueClaims.length, "claim")} past deliverBy — still
-              holding a slot
+            <p className="text-[13px] font-bold text-zk-on-bad">
+              {pluralize(overdueClaims.length, "claim")} past deliverBy
             </p>
-            <p className="mt-0.5 text-[11px] leading-relaxed text-[#fca5a0]">
-              Heartbeats do not move the deadline. Reconcile the claim before it
-              blocks a new offer.
+            <p className="mt-0.5 text-[11px] leading-relaxed text-zk-bad-fg">
+              Heartbeats do not move the deadline.
             </p>
           </div>
           <Link
@@ -202,7 +198,7 @@ export default function DashboardPage() {
       <section>
         <SectionHeader
           title="Your agents today"
-          description="Presence means API use or a heartbeat in the last 15 minutes. Work and attention are separate, so an offline agent can still hold a claim."
+          description="Presence and work are tracked separately — an offline agent can still hold a claim."
           count={agents.length}
           action={
             <Link href="/agents" className="zk-btn zk-btn-ghost zk-btn-xs">
@@ -213,12 +209,11 @@ export default function DashboardPage() {
         />
 
         <div className="zk-card overflow-hidden">
-          <div className="hidden grid-cols-[minmax(0,1.45fr)_minmax(0,0.75fr)_minmax(0,1.45fr)_minmax(0,0.7fr)_minmax(0,0.8fr)_28px] gap-3 border-b border-zk-border bg-zk-seg/40 px-4 py-2.5 text-[10px] font-bold uppercase tracking-[0.07em] text-zk-muted lg:grid">
+          <div className="hidden grid-cols-[minmax(0,1.5fr)_minmax(0,0.8fr)_minmax(0,1.6fr)_minmax(0,0.8fr)_28px] gap-3 border-b border-zk-border px-4 py-2.5 text-[10px] font-semibold uppercase tracking-[0.07em] text-zk-muted lg:grid">
             <span>Agent</span>
             <span>Presence</span>
             <span>Current work</span>
             <span>Needs you</span>
-            <span>Last 30 days</span>
             <span className="sr-only">Open</span>
           </div>
 
@@ -232,7 +227,7 @@ export default function DashboardPage() {
               return (
                 <div
                   key={agent.id}
-                  className="grid gap-3 p-4 lg:grid-cols-[minmax(0,1.45fr)_minmax(0,0.75fr)_minmax(0,1.45fr)_minmax(0,0.7fr)_minmax(0,0.8fr)_28px] lg:items-center"
+                  className="grid gap-3 p-4 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,0.8fr)_minmax(0,1.6fr)_minmax(0,0.8fr)_28px] lg:items-center"
                 >
                   <div className="flex min-w-0 items-center justify-between gap-2">
                     <AgentIdentity agent={agent} />
@@ -304,29 +299,13 @@ export default function DashboardPage() {
                     {pendingNeeds.length > 0 ? (
                       <Link
                         href={`/needs-you#${pendingNeeds[0].id}`}
-                        className="inline-flex flex-col items-start gap-1"
+                        className="inline-flex"
                       >
                         <Badge tone="warn">{pendingNeeds.length} pending</Badge>
-                        <span className="text-[10px] text-zk-muted">
-                          Open the queue
-                        </span>
                       </Link>
                     ) : (
                       <Badge tone="ok">Clear</Badge>
                     )}
-                  </div>
-
-                  <div>
-                    <MobileLabel>Last 30 days</MobileLabel>
-                    <p className="text-[12px] font-bold text-zk-text">
-                      {pluralize(agent.stats.acceptedFixes, "fix")}
-                    </p>
-                    <p className="mt-0.5 text-[10px] text-zk-muted">
-                      {agent.stats.reviews > 0
-                        ? `${pluralize(agent.stats.reviews, "review")} · `
-                        : ""}
-                      {pluralize(agent.stats.releases, "release")}
-                    </p>
                   </div>
 
                   <Link
@@ -347,7 +326,7 @@ export default function DashboardPage() {
         <section>
           <SectionHeader
             title="Needs you now"
-            description="The three nearest deadlines. Open the queue for every request."
+            description="Nearest deadlines first."
             count={openNeeds.length}
             action={
               <Link href="/needs-you" className="zk-btn zk-btn-ghost zk-btn-xs">
@@ -360,7 +339,7 @@ export default function DashboardPage() {
           {topNeeds.length === 0 ? (
             <div className="zk-card flex items-start gap-3 p-4">
               <CheckCircle2
-                className="mt-0.5 h-4 w-4 shrink-0 text-[#6ee7a8]"
+                className="mt-0.5 h-4 w-4 shrink-0 text-zk-ok-fg"
                 aria-hidden="true"
               />
               <div>
@@ -368,8 +347,7 @@ export default function DashboardPage() {
                   Nothing needs you right now
                 </p>
                 <p className="mt-0.5 text-[11px] leading-relaxed text-zk-muted">
-                  Your agents will ask here when a decision, approval or offer
-                  needs a human.
+                  Agents will ask here when a decision needs a human.
                 </p>
               </div>
             </div>
@@ -392,10 +370,10 @@ export default function DashboardPage() {
                       className={cn(
                         "flex h-8 w-8 shrink-0 items-center justify-center rounded-full",
                         need.kind === "claim"
-                          ? "bg-[#3a1517] text-[#fca5a0]"
+                          ? "bg-zk-bad-bg text-zk-bad-fg"
                           : need.kind === "offer"
-                            ? "bg-[#3a2c0c] text-[#f6cf6b]"
-                            : "bg-[#14294f] text-[#9cc2ff]",
+                            ? "bg-zk-warn-bg text-zk-warn-fg"
+                            : "bg-zk-info-bg text-zk-info-fg",
                       )}
                     >
                       <Icon className="h-3.5 w-3.5" aria-hidden="true" />
@@ -482,21 +460,6 @@ export default function DashboardPage() {
         </section>
       </div>
 
-      <p className="flex items-start gap-2 rounded-2xl border border-dashed border-[#2a3f61] bg-zk-seg/40 px-4 py-3 text-[11px] leading-relaxed text-zk-muted">
-        <Info className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#9cc2ff]" aria-hidden="true" />
-        Offline does not mean idle: a claim can stay active after heartbeats
-        stop. The queue flags that mismatch instead of hiding it behind a green
-        status.
-        <a
-          href="https://ziki.dev"
-          target="_blank"
-          rel="noreferrer"
-          className="ml-auto inline-flex shrink-0 items-center gap-1 font-bold text-zk-accent hover:text-white"
-        >
-          ziki.dev
-          <ArrowUpRight className="h-3 w-3" aria-hidden="true" />
-        </a>
-      </p>
     </div>
   );
 }

@@ -3,6 +3,7 @@ import "@fontsource-variable/inter";
 import "./globals.css";
 import { AppShell } from "@/components/app-shell";
 import { DemoProvider } from "@/lib/demo-store";
+import { THEME_INIT_SCRIPT } from "@/lib/theme";
 
 export const metadata: Metadata = {
   title: {
@@ -16,14 +17,17 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   themeColor: "#070f22",
-  colorScheme: "dark",
+  colorScheme: "dark light",
 };
 
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en">
+    <html lang="en" data-theme="dark" suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
+      </head>
       <body>
         <DemoProvider>
           <AppShell>{children}</AppShell>

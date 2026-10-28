@@ -49,19 +49,19 @@ const ATTENTION_META: Record<
     label: "Question",
     action: "Answer",
     icon: HelpCircle,
-    iconClass: "bg-[#3a2c0c] text-[#f6cf6b]",
+    iconClass: "bg-zk-warn-bg text-zk-warn-fg",
   },
   approval: {
     label: "Approval",
     action: "Review gate",
     icon: ShieldCheck,
-    iconClass: "bg-[#14294f] text-[#9cc2ff]",
+    iconClass: "bg-zk-info-bg text-zk-info-fg",
   },
   claim: {
     label: "Stale claim",
     action: "Release or extend",
     icon: CircleAlert,
-    iconClass: "bg-[#3a1517] text-[#fca5a0]",
+    iconClass: "bg-zk-bad-bg text-zk-bad-fg",
   },
 };
 
@@ -193,7 +193,7 @@ function ActivityView() {
       <PageHeader
         eyebrow="Zedu · Work history"
         title="Activity"
-        description="What your agents did, what state each claim is in, and what still blocks them. Every claim is one row — heartbeats, reminders and re-offers update that row instead of creating noise."
+        description="One row per claim, newest state first. Heartbeats and reminders update the row instead of adding noise."
         actions={
           <>
             <Link href="/agents" className="zk-btn zk-btn-secondary zk-btn-sm">
@@ -215,7 +215,7 @@ function ActivityView() {
         <StatCard
           label="Needs you"
           value={needsCount}
-          hint="Questions, offers and approvals"
+          hint="Pending decisions"
           icon={Inbox}
           tone="warn"
         />
@@ -242,7 +242,7 @@ function ActivityView() {
         <StatCard
           label="Accepted fixes"
           value={acceptedFixes.length}
-          hint="Recorded in the last 30 days"
+          hint="Last 30 days"
           icon={CheckCircle2}
           tone="ok"
         />
@@ -290,16 +290,13 @@ function ActivityView() {
               <Link
                 href="/activity"
                 scroll={false}
-                className="ml-0.5 inline-flex h-4 w-4 items-center justify-center rounded-full hover:bg-white/10"
+                className="ml-0.5 inline-flex h-4 w-4 items-center justify-center rounded-full hover:bg-zk-active"
               >
                 <X className="h-3 w-3" aria-hidden="true" />
                 <span className="sr-only">Clear issue filter</span>
               </Link>
             </span>
           ) : null}
-          <p className="text-[11px] text-zk-muted">
-            Search filters every section on this page.
-          </p>
         </div>
       </div>
 
@@ -307,7 +304,7 @@ function ActivityView() {
         <div id="waiting-on-you">
           <SectionHeader
             title="Waiting on you"
-            description="Questions, pipeline gates and stale claims that block agent work. Decisions stay in the canonical Needs you queue."
+            description="Requests that are blocking agent work."
             count={attention.length}
             action={
               <Link
@@ -427,7 +424,7 @@ function ActivityView() {
         ) : (
           <EmptyState
             title="Nothing waiting on you"
-            description="No question, pipeline gate or stale claim is blocking an agent right now. New requests will appear here and in the queue."
+            description="No question, gate or stale claim is blocking an agent right now."
             icon={CheckCircle2}
             action={
               <Link
@@ -445,7 +442,7 @@ function ActivityView() {
         <div id="work-history">
           <SectionHeader
             title="Work history"
-            description="One row per claim, newest state first. Expand a row for the full event chain with exact times — repeated cycles stay collapsed into the same claim."
+            description="Expand a row for the full event chain."
             count={filteredClaims.length}
           />
         </div>
@@ -550,7 +547,7 @@ function ActivityView() {
         <section>
           <SectionHeader
             title="Delivered outcomes"
-            description="Accepted fixes and other completed work that is no longer an active claim."
+            description="Completed work that is no longer an active claim."
             count={filteredOutcomes.length}
           />
           <div className="zk-card divide-y divide-zk-divider overflow-hidden">
@@ -567,7 +564,7 @@ function ActivityView() {
                       className={cn(
                         "mt-0.5 inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full",
                         outcome.acceptedFix
-                          ? "bg-[#0f3326] text-[#6ee7a8]"
+                          ? "bg-zk-ok-bg text-zk-ok-fg"
                           : "bg-zk-chip text-zk-text2",
                       )}
                     >
@@ -585,7 +582,7 @@ function ActivityView() {
                       </p>
                       {agent ? (
                         <p className="mt-1 text-[10px] text-zk-muted">
-                          {agent.name} · {agent.model}
+                          {agent.name}
                         </p>
                       ) : null}
                     </div>
@@ -599,30 +596,6 @@ function ActivityView() {
           </div>
         </section>
       ) : null}
-
-      <div className="zk-card grid gap-4 p-4 sm:grid-cols-3 sm:p-5">
-        <div>
-          <p className="zk-label">One row per claim</p>
-          <p className="mt-1.5 text-[11px] leading-relaxed text-zk-text2">
-            Heartbeats, reminders and re-offers update the same claim. #1149
-            stays one chain across its three cycles instead of filling the feed.
-          </p>
-        </div>
-        <div>
-          <p className="zk-label">State first</p>
-          <p className="mt-1.5 text-[11px] leading-relaxed text-zk-text2">
-            Each row leads with where the work stands, then timing and the next
-            step. The event chain is one click away, not the main view.
-          </p>
-        </div>
-        <div>
-          <p className="zk-label">One inbox</p>
-          <p className="mt-1.5 text-[11px] leading-relaxed text-zk-text2">
-            Requests waiting on you link back to the canonical Needs you queue.
-            This page never creates a second place to act.
-          </p>
-        </div>
-      </div>
     </div>
   );
 }

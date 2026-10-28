@@ -26,25 +26,25 @@ const KIND_META = {
   question: {
     label: "Question",
     icon: HelpCircle,
-    iconClass: "bg-[#14294f] text-[#9cc2ff]",
+    iconClass: "bg-zk-info-bg text-zk-info-fg",
     tone: "info" as const,
   },
   offer: {
     label: "Offer",
     icon: Mail,
-    iconClass: "bg-[#3a2c0c] text-[#f6cf6b]",
+    iconClass: "bg-zk-warn-bg text-zk-warn-fg",
     tone: "warn" as const,
   },
   approval: {
     label: "Pipeline gate",
     icon: ShieldCheck,
-    iconClass: "bg-[#14294f] text-[#9cc2ff]",
+    iconClass: "bg-zk-info-bg text-zk-info-fg",
     tone: "info" as const,
   },
   claim: {
     label: "Stale claim",
     icon: AlertTriangle,
-    iconClass: "bg-[#3a1517] text-[#fca5a0]",
+    iconClass: "bg-zk-bad-bg text-zk-bad-fg",
     tone: "bad" as const,
   },
 };
@@ -160,44 +160,40 @@ export function NeedCard({ need }: { need: NeedItem }) {
         expired && "border-dashed",
       )}
     >
-      <div className="border-b border-zk-divider bg-zk-seg/40 px-4 py-3 sm:px-5">
-        <div className="flex flex-wrap items-center gap-x-2.5 gap-y-2">
-          <span
-            className={cn(
-              "inline-flex h-9 w-9 items-center justify-center rounded-full",
-              meta.iconClass,
-            )}
-          >
-            <Icon className="h-4 w-4" aria-hidden="true" />
-          </span>
-          <Badge tone={expired ? "warn" : meta.tone}>{meta.label}</Badge>
-          <span className="text-[11px] text-zk-muted">from</span>
-          <AgentIdentity agent={agent} compact />
-          <div className="ml-auto flex flex-wrap items-center gap-1.5">
-            <PresenceBadge agent={agent} />
-            {expired ? (
-              <Badge tone="warn">
-                Expired {formatRelative(need.expiresAt ?? need.createdAt, now)}
-              </Badge>
-            ) : deadline ? (
-              <TimeMeter
-                target={deadline}
-                now={now}
-                label={need.kind === "question" ? "Claim release" : undefined}
-              />
-            ) : (
-              <span className="text-[11px] text-zk-muted">
-                Waiting {formatDuration(now - need.createdAt)}
-              </span>
-            )}
-          </div>
+      <div className="flex flex-wrap items-center gap-x-2.5 gap-y-2 border-b border-zk-divider px-4 py-3 sm:px-5">
+        <span
+          className={cn(
+            "inline-flex h-8 w-8 items-center justify-center rounded-full",
+            meta.iconClass,
+          )}
+        >
+          <Icon className="h-4 w-4" aria-hidden="true" />
+        </span>
+        <Badge tone={expired ? "warn" : meta.tone}>{meta.label}</Badge>
+        <AgentIdentity agent={agent} compact />
+        <div className="ml-auto flex flex-wrap items-center gap-1.5">
+          <PresenceBadge agent={agent} />
+          {expired ? (
+            <Badge tone="warn">
+              Expired {formatRelative(need.expiresAt ?? need.createdAt, now)}
+            </Badge>
+          ) : deadline ? (
+            <TimeMeter
+              target={deadline}
+              now={now}
+              label={need.kind === "question" ? "Claim release" : undefined}
+            />
+          ) : (
+            <span className="text-[11px] text-zk-muted">
+              Waiting {formatDuration(now - need.createdAt)}
+            </span>
+          )}
         </div>
       </div>
 
       <div className="p-4 sm:p-5">
         <div className="flex flex-wrap items-center gap-2">
           <IssueLink issue={need.issue} />
-          <Badge tone="neutral">{need.issue.project}</Badge>
           <Badge
             tone={
               need.issue.priority === "High" || need.issue.priority === "Critical"
@@ -209,23 +205,12 @@ export function NeedCard({ need }: { need: NeedItem }) {
           </Badge>
         </div>
 
-        <h3 className="mt-1.5 text-[17px] font-extrabold leading-snug tracking-[-0.015em] text-zk-text sm:text-lg">
+        <h3 className="mt-2 text-[15px] font-bold leading-snug tracking-[-0.01em] text-zk-text">
           {need.title}
         </h3>
         <p className="mt-1.5 max-w-3xl text-[13px] leading-relaxed text-zk-text2">
           {need.detail}
         </p>
-
-        <div className="mt-3 grid gap-2 sm:grid-cols-3">
-          {need.context.map((item) => (
-            <div
-              key={item}
-              className="rounded-xl border border-zk-divider bg-zk-seg/50 px-3 py-2 text-[11px] leading-snug text-zk-text2"
-            >
-              {item}
-            </div>
-          ))}
-        </div>
 
         <p className="mt-3 flex items-start gap-2 text-[11px] leading-relaxed text-zk-muted">
           <Info className="mt-0.5 h-3.5 w-3.5 shrink-0" aria-hidden="true" />
@@ -234,7 +219,7 @@ export function NeedCard({ need }: { need: NeedItem }) {
 
         {answering ? (
           <form
-            className="mt-4 rounded-2xl border border-[#294a7f] bg-[#0a1530] p-3"
+            className="mt-4 rounded-2xl border border-zk-info-bd bg-zk-info-bg/40 p-3"
             onSubmit={(event) => {
               event.preventDefault();
               if (!answer.trim()) return;
@@ -256,7 +241,7 @@ export function NeedCard({ need }: { need: NeedItem }) {
                     key={suggestion}
                     type="button"
                     onClick={() => setAnswer(suggestion)}
-                    className="zk-chip transition hover:border-[#3d5a8a] hover:text-zk-text"
+                    className="zk-chip transition hover:border-zk-border-strong hover:text-zk-text"
                   >
                     {suggestion}
                   </button>
@@ -270,11 +255,8 @@ export function NeedCard({ need }: { need: NeedItem }) {
               className="zk-textarea mt-2"
               rows={3}
               autoFocus
-              placeholder="Answer the agent. This resumes any paused claim and is recorded on the issue."
+              placeholder="Answer the agent to resume the claim."
             />
-            <p className="mt-1.5 text-[10px] text-zk-muted">
-              The answer is visible to the agent and in the issue history.
-            </p>
             <div className="mt-3 flex flex-wrap items-center gap-2">
               <button
                 type="submit"

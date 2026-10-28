@@ -10,23 +10,23 @@ const TONE_STYLES: Record<
 > = {
   success: {
     icon: CircleCheck,
-    className: "border-[#1d5a40] bg-[#0f3326] text-[#d8fbe8]",
-    iconClassName: "text-[#6ee7a8]",
+    className: "border-zk-ok-bd bg-zk-ok-bg text-zk-on-ok",
+    iconClassName: "text-zk-ok-fg",
   },
   info: {
     icon: Info,
-    className: "border-[#294a7f] bg-[#14294f] text-[#dceaff]",
-    iconClassName: "text-[#9cc2ff]",
+    className: "border-zk-info-bd bg-zk-info-bg text-zk-on-info",
+    iconClassName: "text-zk-info-fg",
   },
   warn: {
     icon: CircleAlert,
-    className: "border-[#6b5216] bg-[#3a2c0c] text-[#fff3d0]",
-    iconClassName: "text-[#f6cf6b]",
+    className: "border-zk-warn-bd bg-zk-warn-bg text-zk-on-warn",
+    iconClassName: "text-zk-warn-fg",
   },
   error: {
     icon: CircleAlert,
-    className: "border-[#6b2a27] bg-[#3a1517] text-[#ffe3e0]",
-    iconClassName: "text-[#fca5a0]",
+    className: "border-zk-bad-bd bg-zk-bad-bg text-zk-on-bad",
+    iconClassName: "text-zk-bad-fg",
   },
 };
 
@@ -61,7 +61,7 @@ export function Toaster({
             <button
               type="button"
               onClick={() => onDismiss(toast.id)}
-              className="-mr-1 -mt-1 inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full opacity-70 transition hover:bg-white/10 hover:opacity-100"
+              className="-mr-1 -mt-1 inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full opacity-70 transition hover:bg-zk-active hover:opacity-100"
               aria-label="Dismiss notification"
             >
               <X className="h-3.5 w-3.5" aria-hidden="true" />

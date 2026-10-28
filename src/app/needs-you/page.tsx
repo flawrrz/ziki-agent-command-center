@@ -4,7 +4,6 @@ import { useState } from "react";
 import Link from "next/link";
 import {
   CheckCircle2,
-  Clock,
   HelpCircle,
   Inbox,
   Mail,
@@ -70,7 +69,7 @@ export default function NeedsYouPage() {
       <PageHeader
         eyebrow="Zedu · Human–agent queue"
         title="Needs you"
-        description="One canonical queue for every question, offer, approval and stale claim from your agents. Cards are ordered by deadline and each one states what happens if you wait."
+        description="Every question, offer, approval and stale claim from your agents, ordered by deadline."
         actions={
           <>
             <Link href="/agents" className="zk-btn zk-btn-secondary zk-btn-sm">
@@ -83,35 +82,14 @@ export default function NeedsYouPage() {
         }
       />
 
-      <div className="flex flex-wrap items-center gap-x-5 gap-y-2 rounded-2xl border border-dashed border-[#2a3f61] bg-zk-seg/40 px-4 py-3 text-[11px] leading-relaxed text-zk-muted">
-        <span>
-          <strong className="text-zk-text2">Offers</strong> expire after 30m
-        </span>
-        <span>
-          <strong className="text-zk-text2">Questions</strong> release a claim
-          after 4h unanswered
-        </span>
-        <span>
-          <strong className="text-zk-text2">Heartbeats</strong> are expected
-          every 15m
-        </span>
-        <span className="ml-auto inline-flex items-center gap-1.5 text-[#9cc2ff]">
-          <Clock className="h-3 w-3" aria-hidden="true" />
-          Timers are live
-        </span>
-      </div>
-
       <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
         <StatCard
           label="Needs you"
           value={needsCount}
           hint={
-            <>
-              {claims.length > 0
-                ? pluralize(claims.length, "stale claim")
-                : "No stale claims"}
-              {offers.length > 0 ? ` · ${pluralize(offers.length, "offer")}` : ""}
-            </>
+            claims.length > 0
+              ? pluralize(claims.length, "stale claim")
+              : "Queue is clear"
           }
           icon={Inbox}
           tone="warn"
@@ -135,9 +113,9 @@ export default function NeedsYouPage() {
           tone="info"
         />
         <StatCard
-          label="Pipeline approvals"
+          label="Approvals"
           value={approvals.length}
-          hint="Workspace-owner decisions"
+          hint="Pipeline gates"
           icon={ShieldCheck}
           tone="info"
         />
@@ -167,12 +145,7 @@ export default function NeedsYouPage() {
                 )}
               >
                 {item.label}
-                <span
-                  className={cn(
-                    "ml-1.5 text-[10px]",
-                    active ? "text-zk-muted" : "text-zk-muted",
-                  )}
-                >
+                <span className="ml-1.5 text-[10px] text-zk-muted">
                   {item.count}
                 </span>
               </button>
@@ -188,7 +161,7 @@ export default function NeedsYouPage() {
         <div id="open-requests">
           <SectionHeader
             title="Open requests"
-            description="Overdue claims come first, then the nearest expiring offer or approval. Questions show when their claim would be released."
+            description="Overdue claims first, then the nearest deadline."
             count={visible.length}
           />
         </div>
@@ -196,7 +169,7 @@ export default function NeedsYouPage() {
         {visible.length === 0 ? (
           <EmptyState
             title="Nothing in this filter"
-            description="Try another type, or view everything that still needs a decision."
+            description="Try another type."
             action={
               <button
                 type="button"
@@ -220,7 +193,7 @@ export default function NeedsYouPage() {
         <section>
           <SectionHeader
             title="Expired offers"
-            description="These offers never started a claim. Re-offer them or leave the issue open."
+            description="Nothing started a claim. Re-offer or leave the issue open."
             count={expiredNeeds.length}
           />
           <div className="space-y-3">
@@ -234,8 +207,8 @@ export default function NeedsYouPage() {
       {resolvedNeeds.length > 0 ? (
         <section>
           <SectionHeader
-            title="Resolved in this session"
-            description="Actions are recorded locally for this demo. Resolutions stay visible instead of disappearing from the queue."
+            title="Resolved"
+            description="Recorded in this browser for this demo."
             count={resolvedNeeds.length}
           />
           <div className="zk-card divide-y divide-zk-divider overflow-hidden">
@@ -249,7 +222,7 @@ export default function NeedsYouPage() {
                 >
                   <div className="flex min-w-0 gap-3">
                     <CheckCircle2
-                      className="mt-0.5 h-4 w-4 shrink-0 text-[#6ee7a8]"
+                      className="mt-0.5 h-4 w-4 shrink-0 text-zk-ok-fg"
                       aria-hidden="true"
                     />
                     <div className="min-w-0">

@@ -83,11 +83,11 @@ export function initials(name: string): string {
 
 export function avatarTone(id: string): string {
   const tones = [
-    "bg-[#2b4a7d]",
-    "bg-[#3d3a78]",
-    "bg-[#1f5a58]",
-    "bg-[#6b4a2c]",
-    "bg-[#5a3358]",
+    "bg-zk-av-1",
+    "bg-zk-av-2",
+    "bg-zk-av-3",
+    "bg-zk-av-4",
+    "bg-zk-av-5",
   ];
   let hash = 0;
 

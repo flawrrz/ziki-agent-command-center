@@ -61,6 +61,12 @@ The simulated rules mirror the live product:
 
 All actions (accept, pass, approve, decline, answer, release, extend, re-offer, pause/resume, re-offer expired offers) run client-side and update the same shared state, so counts, cards, tables and notifications stay consistent.
 
+## Theming
+
+Dark is the default; the header toggle switches to light and the choice is remembered in `localStorage` under `ziki-agent-command-center:theme`. An inline script in `src/app/layout.tsx` applies the saved theme before first paint, so there is no flash and the `theme-color` meta stays in sync.
+
+Every colour used by the UI is declared once in `src/app/globals.css` — the raw palette lives in `:root` and `[data-theme="light"]`, and Tailwind sees the same values through `@theme inline`. Components only reference tokens (`bg-zk-surface`, `text-zk-warn-fg`, `border-zk-bad-bd`), so a new theme is a palette change rather than a component rewrite.
+
 ## Stack
 
 - Next.js 16 (App Router, static prerendering)
@@ -122,6 +128,7 @@ src/
     demo-actions.ts    state transitions and live reconciliation
     demo-store.tsx     client store, persistence and 30s tick
     demo-selectors.ts  derived queues and feed
+    theme.ts           theme read/write and pre-paint init script
     types.ts           domain model
 ```
 

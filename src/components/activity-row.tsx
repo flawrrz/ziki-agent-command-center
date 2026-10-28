@@ -27,12 +27,6 @@ const STATUS_META: Record<
   completed: { label: "Completed", tone: "ok" },
 };
 
-const REASON_LABELS: Record<string, string> = {
-  deadline: "deadline",
-  offer_passed: "offer passed",
-  released_by_owner: "released by owner",
-};
-
 const TIMED_STATUSES = ["active", "overdue", "offered", "awaiting_owner"];
 
 function MobileLabel({ children }: { children: React.ReactNode }) {
@@ -61,9 +55,6 @@ export function ActivityRow({
         <div>
           <MobileLabel>State</MobileLabel>
           <Badge tone={meta.tone}>{meta.label}</Badge>
-          <p className="mt-1 text-[10px] text-zk-muted">
-            Updated {formatRelative(claim.updatedAt, now)}
-          </p>
         </div>
 
         <div className="min-w-0">
@@ -81,10 +72,12 @@ export function ActivityRow({
               {claim.issue.priority}
             </Badge>
             {claim.cycles && claim.cycles > 1 ? (
-              <Badge tone="info">{claim.cycles} cycles collapsed</Badge>
+              <span className="text-[10px] text-zk-muted">
+                {claim.cycles} cycles
+              </span>
             ) : null}
           </div>
-          <p className="mt-1 line-clamp-2 text-[12px] font-bold leading-snug text-zk-text">
+          <p className="mt-1 line-clamp-2 text-[12px] font-semibold leading-snug text-zk-text">
             {claim.issue.title}
           </p>
           <p className="mt-1 text-[11px] leading-snug text-zk-text2">
@@ -118,16 +111,6 @@ export function ActivityRow({
                 : meta.label}
             </span>
           )}
-          {claim.lastHeartbeat ? (
-            <p className="mt-1 text-[10px] text-zk-muted">
-              Heartbeat {formatRelative(claim.lastHeartbeat, now)}
-            </p>
-          ) : null}
-          {claim.releaseReason ? (
-            <p className="mt-0.5 text-[10px] text-zk-muted">
-              Reason: {REASON_LABELS[claim.releaseReason] ?? claim.releaseReason}
-            </p>
-          ) : null}
         </div>
 
         <div className="min-w-0">
@@ -136,11 +119,11 @@ export function ActivityRow({
             className={cn(
               "text-[11px] leading-snug",
               claim.nextStepTone === "bad"
-                ? "font-semibold text-[#fca5a0]"
+                ? "font-semibold text-zk-bad-fg"
                 : claim.nextStepTone === "warn"
-                  ? "font-semibold text-[#f6cf6b]"
+                  ? "font-semibold text-zk-warn-fg"
                   : claim.nextStepTone === "ok"
-                    ? "font-semibold text-[#6ee7a8]"
+                    ? "font-semibold text-zk-ok-fg"
                     : "text-zk-text2",
             )}
           >
@@ -149,7 +132,7 @@ export function ActivityRow({
           {request ? (
             <Link
               href={`/needs-you#${request.id}`}
-              className="mt-1.5 inline-flex items-center gap-1 text-[10px] font-bold text-zk-accent hover:text-white"
+              className="mt-1.5 inline-flex items-center gap-1 text-[10px] font-bold text-zk-accent hover:text-zk-text"
             >
               {request.status === "expired" ? "Review offer" : "Open request"}
               <ArrowUpRight className="h-3 w-3" aria-hidden="true" />
@@ -179,15 +162,13 @@ export function ActivityRow({
       </div>
 
       {expanded ? (
-        <div className="border-t border-zk-divider bg-zk-seg/30 px-4 py-3.5">
+        <div className="border-t border-zk-divider bg-zk-hover px-4 py-3.5">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <p className="zk-label">
               Event chain · {events.length}{" "}
               {events.length === 1 ? "event" : "events"}
             </p>
-            <p className="text-[10px] text-zk-muted">
-              Newest first · times shown in your local timezone
-            </p>
+            <p className="text-[10px] text-zk-muted">Newest first</p>
           </div>
 
           <ol className="mt-3 space-y-3">
@@ -195,7 +176,7 @@ export function ActivityRow({
               <li key={`${event.at}-${index}`} className="flex gap-3">
                 <span className="relative mt-1 flex h-2.5 w-2.5 shrink-0 items-center justify-center">
                   <span
-                    className="h-2 w-2 rounded-full bg-[#4c6a9a]"
+                    className="h-2 w-2 rounded-full bg-zk-dot"
                     aria-hidden="true"
                   />
                 </span>
@@ -223,14 +204,6 @@ export function ActivityRow({
           </ol>
 
           <div className="mt-3 flex flex-wrap items-center gap-2">
-            {request ? (
-              <Link
-                href={`/needs-you#${request.id}`}
-                className="zk-btn zk-btn-secondary zk-btn-xs"
-              >
-                {request.status === "expired" ? "Review expired offer" : "Open request"}
-              </Link>
-            ) : null}
             <a
               href={claim.issue.url}
               target="_blank"

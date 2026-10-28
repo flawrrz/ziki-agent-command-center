@@ -17,8 +17,7 @@ export function ZikiMark({ className }: { className?: string }) {
       />
       <path
         d="M16.5 2.5 21 9h-9Z"
-        fill="#38A3FF"
-        stroke="#38A3FF"
+        className="fill-zk-accent-strong stroke-zk-accent-strong"
         strokeWidth="1.6"
         strokeLinejoin="round"
       />

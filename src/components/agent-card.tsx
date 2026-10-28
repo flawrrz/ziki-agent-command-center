@@ -93,7 +93,7 @@ export function AgentCard({ agent }: { agent: Agent }) {
             <AgentAvatar agent={agent} />
             <div className="min-w-0">
               <div className="flex flex-wrap items-center gap-2">
-                <p className="text-base font-extrabold tracking-[-0.015em] text-zk-text">
+                <p className="text-[15px] font-bold tracking-[-0.01em] text-zk-text">
                   {agent.name}
                 </p>
                 <Badge tone="accent">{LEVEL_LABELS[agent.level]}</Badge>
@@ -141,7 +141,7 @@ export function AgentCard({ agent }: { agent: Agent }) {
           </div>
         </div>
 
-        <div className="mt-4 grid gap-3 rounded-2xl border border-zk-divider bg-zk-seg/40 p-3 sm:grid-cols-3">
+        <div className="zk-inset mt-4 grid gap-3 rounded-2xl p-3 sm:grid-cols-3">
           <div className="min-w-0">
             <p className="zk-label">Presence</p>
             <div className="mt-1.5">
@@ -149,8 +149,8 @@ export function AgentCard({ agent }: { agent: Agent }) {
             </div>
             <p className="mt-1.5 text-[10px] leading-relaxed text-zk-muted">
               {agent.paused
-                ? "Paused by owner · no new offers"
-                : `Last heartbeat ${formatRelative(agent.lastHeartbeat, now)}`}
+                ? "Paused by owner"
+                : `Heartbeat ${formatRelative(agent.lastHeartbeat, now)}`}
             </p>
           </div>
 
@@ -183,7 +183,7 @@ export function AgentCard({ agent }: { agent: Agent }) {
                   </span>
                 </div>
                 {agent.paused ? (
-                  <p className="mt-1 text-[10px] text-[#f6cf6b]">
+                  <p className="mt-1 text-[10px] text-zk-warn-fg">
                     Pausing does not release this claim.
                   </p>
                 ) : null}
@@ -205,15 +205,12 @@ export function AgentCard({ agent }: { agent: Agent }) {
             <p className="zk-label">Attention</p>
             {pending.length > 0 ? (
               <div className="mt-1.5 space-y-1.5">
-                <div className="flex items-center gap-1.5">
-                  <Badge tone="warn">{pending.length} pending</Badge>
-                  <span className="text-[10px] text-zk-muted">from this agent</span>
-                </div>
+                <Badge tone="warn">{pluralize(pending.length, "request")}</Badge>
                 {pending.slice(0, 2).map((need) => (
                   <Link
                     key={need.id}
                     href={`/needs-you#${need.id}`}
-                    className="block text-[10px] leading-snug text-zk-accent hover:text-white"
+                    className="block text-[10px] leading-snug text-zk-accent hover:text-zk-text"
                   >
                     {need.kind === "claim"
                       ? "Claim needs reconciliation"
@@ -227,38 +224,36 @@ export function AgentCard({ agent }: { agent: Agent }) {
                 ))}
                 {pending.length > 2 ? (
                   <p className="text-[10px] text-zk-muted">
-                    +{pending.length - 2} more in Needs you
+                    +{pending.length - 2} more
                   </p>
                 ) : null}
               </div>
             ) : (
               <div className="mt-1.5">
                 <Badge tone="ok">Nothing pending</Badge>
-                <p className="mt-1.5 text-[10px] text-zk-muted">
-                  No questions, offers or approvals.
-                </p>
               </div>
             )}
           </div>
         </div>
 
-        <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-[10px] text-zk-muted">
-          <span>
-            {pluralize(agent.stats.acceptedFixes, "accepted fix")} · 30d
-          </span>
-          <span>{pluralize(agent.stats.reviews, "review")}</span>
-          <span>{pluralize(agent.stats.releases, "release")}</span>
-          <span className="ml-auto">
-            Last action: {agent.lastAction.label} ·{" "}
-            {formatRelative(agent.lastAction.at, now)}
-          </span>
-        </div>
+        <p className="mt-3 text-[10px] text-zk-muted">
+          Last action: {agent.lastAction.label} ·{" "}
+          {formatRelative(agent.lastAction.at, now)}
+        </p>
 
         {expanded ? (
           <div
             id={`agent-details-${agent.id}`}
-            className="mt-4 grid gap-4 border-t border-zk-border pt-4 sm:grid-cols-2"
+            className="mt-4 grid gap-4 border-t border-zk-divider pt-4 sm:grid-cols-2"
           >
+            <p className="text-[10px] text-zk-muted sm:col-span-2">
+              Last 30 days: {pluralize(agent.stats.acceptedFixes, "accepted fix")}
+              {" · "}
+              {pluralize(agent.stats.reviews, "review")}
+              {" · "}
+              {pluralize(agent.stats.releases, "release")}
+            </p>
+
             <div>
               <p className="zk-label">Recent actions</p>
               {recentEvents.length > 0 ? (
@@ -266,7 +261,7 @@ export function AgentCard({ agent }: { agent: Agent }) {
                   {recentEvents.map((event, index) => (
                     <li key={`${event.at}-${index}`} className="flex gap-2.5">
                       <span
-                        className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#4c6a9a]"
+                        className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-zk-dot"
                         aria-hidden="true"
                       />
                       <div className="min-w-0">
@@ -297,7 +292,7 @@ export function AgentCard({ agent }: { agent: Agent }) {
                     <li key={need.id}>
                       <Link
                         href={`/needs-you#${need.id}`}
-                        className="block rounded-xl border border-zk-divider bg-zk-seg/50 px-3 py-2 transition hover:border-[#324b74]"
+                        className="block rounded-xl border border-zk-divider px-3 py-2 transition hover:border-zk-border-strong hover:bg-zk-hover"
                       >
                         <p className="line-clamp-1 text-[11px] font-bold text-zk-text">
                           {need.title}
@@ -318,7 +313,7 @@ export function AgentCard({ agent }: { agent: Agent }) {
             </div>
 
             <div className="sm:col-span-2">
-              <div className="flex flex-wrap items-center gap-2 rounded-xl border border-dashed border-[#2a3f61] px-3 py-2.5">
+              <div className="flex flex-wrap items-center gap-2 rounded-xl border border-dashed border-zk-dashed px-3 py-2.5">
                 <span className="zk-label">Preferred areas</span>
                 {agent.areas.map((area) => (
                   <span key={area} className="zk-chip">
@@ -329,7 +324,7 @@ export function AgentCard({ agent }: { agent: Agent }) {
                   href="https://ziki.dev/settings/agents"
                   target="_blank"
                   rel="noreferrer"
-                  className="ml-auto inline-flex items-center gap-1 text-[10px] font-bold text-zk-accent hover:text-white"
+                  className="ml-auto inline-flex items-center gap-1 text-[10px] font-bold text-zk-accent hover:text-zk-text"
                 >
                   Keys & model live in Ziki settings
                   <ExternalLink className="h-3 w-3" aria-hidden="true" />

@@ -8,11 +8,11 @@ import {
   Inbox,
   LayoutDashboard,
   RotateCcw,
-  Sparkles,
 } from "lucide-react";
 import { useDemo } from "@/lib/demo-store";
 import { cn } from "@/lib/cn";
 import { NotificationsButton } from "./notifications";
+import { ThemeToggle } from "./theme-toggle";
 import { ZikiLogo } from "./ziki-logo";
 
 const NAV_ITEMS = [
@@ -50,7 +50,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               title="Active workspace"
             >
               <span
-                className="h-1.5 w-1.5 rounded-full bg-[#6ee7a8]"
+                className="h-1.5 w-1.5 rounded-full bg-zk-ok-fg"
                 aria-hidden="true"
               />
               Zedu
@@ -75,13 +75,13 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                       "inline-flex h-9 items-center gap-1.5 rounded-full px-3 text-[13px] font-semibold transition",
                       active
                         ? "bg-zk-chip text-zk-text"
-                        : "text-zk-text2 hover:bg-white/[0.04] hover:text-zk-text",
+                        : "text-zk-text2 hover:bg-zk-hover hover:text-zk-text",
                     )}
                   >
                     <Icon
                       className={cn(
                         "h-3.5 w-3.5",
-                        active ? "text-[#8fc9ff]" : "text-zk-muted",
+                        active ? "text-zk-accent" : "text-zk-muted",
                       )}
                       aria-hidden="true"
                     />
@@ -104,22 +104,16 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             </nav>
 
             <div className="ml-auto flex items-center gap-2">
-              <span
-                className="zk-chip hidden border-dashed border-[#35507a] bg-transparent text-[#a9b8d1] xl:inline-flex"
-                title="Illustrative data. Actions stay in this browser."
-              >
-                <Sparkles className="h-3 w-3" aria-hidden="true" />
-                Demo data
-              </span>
+              <ThemeToggle />
               <NotificationsButton />
               <div
-                className="flex items-center gap-2 rounded-full border border-zk-border bg-zk-surface p-1 sm:pr-3"
+                className="hidden items-center gap-2 rounded-full border border-zk-border bg-zk-surface p-1 pr-3 sm:flex"
                 title="Fawaz Yusuff · Zedu workspace"
               >
-                <span className="zk-avatar h-8 w-8 bg-[#2b4a7d] text-[11px]">
+                <span className="zk-avatar h-8 w-8 bg-zk-tint text-[11px]">
                   FY
                 </span>
-                <span className="hidden text-[12px] font-semibold text-zk-text sm:block">
+                <span className="text-[12px] font-semibold text-zk-text">
                   Fawaz
                 </span>
               </div>
@@ -138,8 +132,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         <footer className="mx-auto mt-auto w-full max-w-6xl px-4 pb-28 pt-4 sm:px-6 lg:pb-8">
           <div className="flex flex-col gap-2 border-t border-zk-border pt-4 text-[11px] leading-relaxed text-zk-muted sm:flex-row sm:items-center sm:justify-between">
             <p>
-              Illustrative workspace data · Actions stay in this browser · No
-              Ziki API connection.
+              Prototype data · stays in this browser · no Ziki API connection.
             </p>
             <button
               type="button"
@@ -154,7 +147,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       </div>
 
       <nav
-        className="fixed inset-x-0 bottom-0 z-40 border-t border-zk-border bg-zk-surface px-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-1.5 shadow-[0_-8px_24px_rgba(2,7,18,0.28)] lg:hidden"
+        className="fixed inset-x-0 bottom-0 z-40 border-t border-zk-border bg-zk-surface px-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-1.5 shadow-nav lg:hidden"
         aria-label="Primary navigation"
       >
         <div className="mx-auto flex max-w-md items-center justify-around">
@@ -176,7 +169,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                   <Icon
                     className={cn(
                       "h-[18px] w-[18px]",
-                      active ? "text-[#8fc9ff]" : "text-zk-muted",
+                      active ? "text-zk-accent" : "text-zk-muted",
                     )}
                     aria-hidden="true"
                   />

@@ -78,7 +78,7 @@ export default function AgentsPage() {
       <PageHeader
         eyebrow="Zedu · Agent operations"
         title="Agents"
-        description="Presence, current work and the decisions waiting on you — side by side. Keys, models and deletion stay in Ziki settings; this page is for operating the team."
+        description="Presence, current work and the decisions waiting on you. Keys, models and deletion stay in Ziki settings."
         actions={
           <>
             <Link href="/activity" className="zk-btn zk-btn-secondary zk-btn-sm">
@@ -112,21 +112,21 @@ export default function AgentsPage() {
         <StatCard
           label="Online now"
           value={`${online} / ${agents.length}`}
-          hint="Heartbeat or API use within 15m"
+          hint="Heartbeat or API use in 15m"
           icon={Activity}
           tone="ok"
         />
         <StatCard
           label="Needs attention"
           value={needCount}
-          hint="Questions, offers and approvals"
+          hint="Pending decisions"
           icon={Inbox}
           tone="warn"
         />
         <StatCard
           label="Accepted fixes"
           value={acceptedFixes}
-          hint="All agents · last 30 days"
+          hint="Last 30 days"
           icon={CheckCircle2}
           tone="info"
         />
@@ -178,8 +178,8 @@ export default function AgentsPage() {
           </div>
           <p className="mt-2 text-[10px] leading-relaxed text-zk-muted">
             {atLimit
-              ? "Limit reached. Remove an agent or ask an admin for a higher workspace limit."
-              : "New agents can be created from Ziki settings."}
+              ? "Remove an agent or ask an admin for a higher limit."
+              : "New agents are created from Ziki settings."}
           </p>
         </div>
       </div>
@@ -239,14 +239,9 @@ export default function AgentsPage() {
         </div>
       </div>
 
-      <div className="flex items-center justify-between gap-2">
-        <p className="text-[11px] text-zk-muted">
-          Showing {filtered.length} of {pluralize(agents.length, "agent")}
-        </p>
-        <p className="hidden text-[11px] text-zk-muted sm:block">
-          Presence and work are independent
-        </p>
-      </div>
+      <p className="text-[11px] text-zk-muted">
+        Showing {filtered.length} of {pluralize(agents.length, "agent")}
+      </p>
 
       {filtered.length === 0 ? (
         <EmptyState
@@ -274,14 +269,14 @@ export default function AgentsPage() {
       )}
 
       <p className="text-[11px] text-zk-muted">
-        Need to rotate a key, change a model or remove an agent?{" "}
+        Rotate a key, change a model or remove an agent in{" "}
         <a
           href="https://ziki.dev/settings/agents"
           target="_blank"
           rel="noreferrer"
-          className="font-bold text-zk-accent hover:text-white"
+          className="font-bold text-zk-accent hover:text-zk-text"
         >
-          Open Ziki agent settings
+          Ziki agent settings
         </a>
         .
       </p>

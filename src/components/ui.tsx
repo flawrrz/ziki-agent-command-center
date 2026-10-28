@@ -38,16 +38,16 @@ export function Badge({
 }) {
   const dotColor =
     tone === "ok"
-      ? "bg-[#6ee7a8]"
+      ? "bg-zk-ok-fg"
       : tone === "warn"
-        ? "bg-[#f6cf6b]"
+        ? "bg-zk-warn-fg"
         : tone === "bad"
-          ? "bg-[#fca5a0]"
+          ? "bg-zk-bad-fg"
           : tone === "info"
-            ? "bg-[#9cc2ff]"
+            ? "bg-zk-info-fg"
             : tone === "accent"
-              ? "bg-[#8fc9ff]"
-              : "bg-[#93a0b8]";
+              ? "bg-zk-accent"
+              : "bg-zk-muted";
 
   return (
     <span className={cn("zk-chip", TONE_CLASSES[tone], className)}>
@@ -110,7 +110,7 @@ export function AgentIdentity({
       <AgentAvatar agent={agent} size={compact ? "sm" : "md"} />
       <span className="min-w-0">
         <span className="flex flex-wrap items-center gap-x-2 gap-y-0.5">
-          <span className="truncate text-sm font-bold text-zk-text">
+          <span className="truncate text-sm font-semibold text-zk-text">
             {agent.name}
           </span>
           {agent.personal ? (
@@ -139,12 +139,12 @@ export function PageHeader({
   return (
     <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
       <div className="min-w-0">
-        {eyebrow ? <p className="zk-label mb-2">{eyebrow}</p> : null}
-        <h1 className="text-[28px] font-extrabold leading-tight tracking-[-0.025em] text-zk-text sm:text-[32px]">
+        {eyebrow ? <p className="zk-label mb-1.5">{eyebrow}</p> : null}
+        <h1 className="text-[26px] font-bold leading-tight tracking-[-0.02em] text-zk-text sm:text-[28px]">
           {title}
         </h1>
         {description ? (
-          <p className="mt-1.5 max-w-2xl text-sm leading-relaxed text-zk-text2">
+          <p className="mt-1.5 max-w-xl text-[13px] leading-relaxed text-zk-muted">
             {description}
           </p>
         ) : null}
@@ -176,15 +176,17 @@ export function SectionHeader({
           {Icon ? (
             <Icon className="h-4 w-4 text-zk-muted" aria-hidden="true" />
           ) : null}
-          <h2 className="text-lg font-extrabold tracking-[-0.015em] text-zk-text">
+          <h2 className="text-[17px] font-bold tracking-[-0.01em] text-zk-text">
             {title}
           </h2>
           {typeof count === "number" ? (
-            <span className="zk-chip min-h-[1.35rem] px-2 text-[10px]">{count}</span>
+            <span className="text-[12px] font-semibold text-zk-muted">
+              {count}
+            </span>
           ) : null}
         </div>
         {description ? (
-          <p className="mt-1 max-w-2xl text-[13px] leading-relaxed text-zk-muted">
+          <p className="mt-1 max-w-xl text-[12px] leading-relaxed text-zk-muted">
             {description}
           </p>
         ) : null}
@@ -209,35 +211,30 @@ export function StatCard({
 }) {
   const iconClass =
     tone === "bad"
-      ? "bg-[#3a1517] text-[#fca5a0]"
+      ? "text-zk-bad-fg"
       : tone === "warn"
-        ? "bg-[#3a2c0c] text-[#f6cf6b]"
+        ? "text-zk-warn-fg"
         : tone === "ok"
-          ? "bg-[#0f3326] text-[#6ee7a8]"
+          ? "text-zk-ok-fg"
           : tone === "info"
-            ? "bg-[#14294f] text-[#9cc2ff]"
-            : "bg-zk-chip text-zk-text2";
+            ? "text-zk-info-fg"
+            : "text-zk-muted";
 
   return (
-    <div className="zk-card p-4 sm:p-[18px]">
+    <div className="zk-card p-4">
       <div className="flex items-start justify-between gap-3">
         <p className="zk-label">{label}</p>
         {Icon ? (
-          <span
-            className={cn(
-              "inline-flex h-8 w-8 items-center justify-center rounded-full",
-              iconClass,
-            )}
-          >
-            <Icon className="h-4 w-4" aria-hidden="true" />
-          </span>
+          <Icon className={cn("h-4 w-4 shrink-0", iconClass)} aria-hidden="true" />
         ) : null}
       </div>
-      <p className="mt-2 text-[26px] font-extrabold leading-none tracking-[-0.03em] text-zk-text">
+      <p className="mt-2.5 text-[24px] font-bold leading-none tracking-[-0.02em] text-zk-text">
         {value}
       </p>
       {hint ? (
-        <div className="mt-2 text-xs leading-relaxed text-zk-muted">{hint}</div>
+        <div className="mt-1.5 text-[11px] leading-relaxed text-zk-muted">
+          {hint}
+        </div>
       ) : null}
     </div>
   );
@@ -259,7 +256,7 @@ export function EmptyState({
       <span className="flex h-11 w-11 items-center justify-center rounded-full bg-zk-chip text-zk-muted">
         <Icon className="h-5 w-5" aria-hidden="true" />
       </span>
-      <p className="mt-3 text-sm font-bold text-zk-text">{title}</p>
+      <p className="mt-3 text-sm font-semibold text-zk-text">{title}</p>
       {description ? (
         <p className="mt-1 max-w-sm text-[13px] leading-relaxed text-zk-muted">
           {description}
@@ -311,7 +308,7 @@ export function IssueLink({ issue }: { issue: Issue }) {
       href={issue.url}
       target="_blank"
       rel="noreferrer"
-      className="inline-flex items-center gap-1 text-[12px] font-semibold text-zk-accent transition hover:text-white"
+      className="inline-flex items-center gap-1 text-[12px] font-semibold text-zk-accent transition hover:text-zk-text"
     >
       #{issue.number}
       <ArrowUpRight className="h-3 w-3" aria-hidden="true" />
