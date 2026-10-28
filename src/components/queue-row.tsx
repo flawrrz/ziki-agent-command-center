@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { Check } from "lucide-react";
 import { type BoardCard } from "@/lib/board";
 import { claimProgress, CHECKPOINTS } from "@/lib/progress";
 import { formatDuration, formatRelative, initials } from "@/lib/format";
@@ -34,6 +33,7 @@ export function QueueRow({
 }) {
   const clock = clockText(card, now);
   const claim = card.claim;
+  const shipped = card.rail === "shipped";
   const progress = claim ? claimProgress(claim, now) : null;
   const stage = progress?.stage ?? -1;
   const stageCode = progress && stage >= 0 ? CHECKPOINTS[stage].code : "—";
@@ -84,7 +84,7 @@ export function QueueRow({
           />
         ) : null}
 
-        {claim && card.rail === "running" ? (
+        {claim && card.rail !== "waiting" ? (
           <>
             <CheckpointRail
               claim={claim}
@@ -94,10 +94,20 @@ export function QueueRow({
             {/* Where there is room, name the stage instead of leaving it to the
                 legend. Below sm the five cells would be unreadable, so the row
                 falls back to the count. */}
-            <span className="hidden w-[26px] shrink-0 text-[10px] font-bold tracking-[0.04em] text-zk-info-fg xl:inline">
+            <span
+              className={cn(
+                "hidden w-[26px] shrink-0 text-[10px] font-bold tracking-[0.04em] xl:inline",
+                shipped ? "text-zk-ok-fg" : "text-zk-info-fg",
+              )}
+            >
               {stageCode}
             </span>
-            <span className="zk-num w-[30px] shrink-0 text-right text-[10px] text-zk-info-fg sm:hidden">
+            <span
+              className={cn(
+                "zk-num w-[30px] shrink-0 text-right text-[10px] sm:hidden",
+                shipped ? "text-zk-ok-fg" : "text-zk-info-fg",
+              )}
+            >
               {stage < 0 ? "0/5" : `${stage + 1}/5`}
             </span>
           </>
@@ -109,9 +119,6 @@ export function QueueRow({
             late ? "font-bold text-zk-bad-fg" : "text-zk-muted",
           )}
         >
-          {card.rail === "shipped" ? (
-            <Check className="ml-auto h-3 w-3 text-zk-ok-fg" aria-hidden="true" />
-          ) : null}
           {clock}
         </span>
 

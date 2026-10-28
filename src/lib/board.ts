@@ -145,7 +145,7 @@ function runningCard(
   };
 }
 
-function shippedCard(outcome: Outcome, agents: Agent[]): BoardCard {
+function shippedCard(outcome: Outcome, agents: Agent[], claim?: Claim): BoardCard {
   const agent = agents.find((candidate) => candidate.id === outcome.agentId);
 
   return {
@@ -154,6 +154,9 @@ function shippedCard(outcome: Outcome, agents: Agent[]): BoardCard {
     issue: outcome.issue,
     agent,
     outcome,
+    /* The rail on a shipped row is the claim that produced the outcome, so the
+       row can show the whole awarded → merged path rather than a tick. */
+    claim,
     tag: shortLabel(outcome.label),
     overdue: false,
     at: outcome.at,
@@ -214,7 +217,7 @@ export function buildBoard(state: DemoState, now: number): Board {
         !waitingIssues.has(outcome.issue.number),
     )
     .sort((a, b) => b.at - a.at)
-    .map((outcome) => shippedCard(outcome, state.agents));
+    .map((outcome) => shippedCard(outcome, state.agents, latest.get(outcome.issue.number)));
 
   return { waiting, running, shipped, waitingIssues };
 }

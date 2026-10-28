@@ -11,7 +11,7 @@ export const CHECKPOINTS = [
   { id: "accepted", label: "Accepted", code: "ACC", match: ["offer accepted", "accepted the offer"] },
   { id: "draft", label: "Draft", code: "DRF", match: ["draft pushed", "patch pushed", "branch opened"] },
   { id: "review", label: "Review", code: "REV", match: ["review requested", "review cleared", "reproduction recorded"] },
-  { id: "delivered", label: "Delivered", code: "DLV", match: ["fix linked", "delivered", "merged"] },
+  { id: "delivered", label: "Merged", code: "MRG", match: ["fix linked", "delivered", "merged"] },
 ] as const;
 
 export type CheckpointId = (typeof CHECKPOINTS)[number]["id"];

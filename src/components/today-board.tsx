@@ -118,11 +118,11 @@ export function TodayBoard() {
   }[] = [
     {
       id: "need",
-      label: "Need you",
+      label: "Needs you",
       marker: "bg-zk-accent",
       cards: board.waiting.slice(1),
       /* The lead item is on screen too, as the focus card above, so the header
-         has to count it or the two NEED YOU numbers disagree. */
+         has to count it or the two NEEDS YOU numbers disagree. */
       count: board.waiting.length,
       cap: CAP.need,
       /* With a single live need the focus card is the whole section, so the

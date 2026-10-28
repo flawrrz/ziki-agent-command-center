@@ -25,7 +25,7 @@ export function Ledger({
 }) {
   const cells: Cell[] = [
     {
-      label: "Need you",
+      label: "Needs you",
       value: waiting,
       href: "#need",
       tone: "text-zk-accent",

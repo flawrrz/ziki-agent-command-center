@@ -10,7 +10,7 @@ import { cn } from "@/lib/cn";
 
 const FILTERS: { id: CellState | "all"; label: string }[] = [
   { id: "all", label: "All" },
-  { id: "need", label: "Need you" },
+  { id: "need", label: "Needs you" },
   { id: "late", label: "Past due" },
   { id: "running", label: "Running" },
   { id: "delivered", label: "Delivered" },
