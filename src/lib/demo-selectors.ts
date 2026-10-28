@@ -111,6 +111,8 @@ export function presenceMeta(agent: Agent): PresenceMeta {
 }
 
 export function buildFeed(state: DemoState): FeedItem[] {
+  const read = new Set(state.readNotificationIds);
+
   const needItems: FeedItem[] = state.needs
     .filter((need) => need.status !== "resolved")
     .map((need) => {
@@ -128,23 +130,26 @@ export function buildFeed(state: DemoState): FeedItem[] {
         needsYou: true,
         expiresAt: need.expiresAt,
         href: `/issue/${need.issue.number}#${need.id}`,
-        unread: !state.readNotificationIds.includes(`feed-${need.id}`),
+        unread: !read.has(`feed-${need.id}`),
       };
     });
 
-  const updateItems: FeedItem[] = state.updates.map((update) => ({
-    id: `feed-${update.id}`,
-    issue: update.issue,
-    actorName: update.actorName,
-    actorRole: update.actorRole,
-    ownerName: update.ownerName,
-    title: update.title,
-    detail: update.detail,
-    at: update.at,
-    needsYou: false,
-    href: `/issue/${update.issue.number}`,
-    unread: !state.readNotificationIds.includes(`feed-${update.id}`),
-  }));
+  const updateItems: FeedItem[] = [...state.updates]
+    .sort((a, b) => b.at - a.at)
+    .slice(0, 40)
+    .map((update) => ({
+      id: `feed-${update.id}`,
+      issue: update.issue,
+      actorName: update.actorName,
+      actorRole: update.actorRole,
+      ownerName: update.ownerName,
+      title: update.title,
+      detail: update.detail,
+      at: update.at,
+      needsYou: false,
+      href: `/issue/${update.issue.number}`,
+      unread: !read.has(`feed-${update.id}`),
+    }));
 
   return [...needItems, ...updateItems].sort((a, b) => b.at - a.at);
 }

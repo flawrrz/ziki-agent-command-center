@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowLeft, ExternalLink, Info } from "lucide-react";
+import { ArrowLeft, ExternalLink } from "lucide-react";
 import { useDemo } from "@/lib/demo-store";
+import { CELL_TEXT } from "@/lib/board";
 import { formatCountdown, formatDateTime, formatRelative } from "@/lib/format";
 import type { Issue } from "@/lib/types";
 import { cn } from "@/lib/cn";
@@ -13,6 +14,7 @@ import {
   PageSkeleton,
   PresenceBadge,
 } from "./ui";
+import { CheckpointReadout } from "./checkpoint-rail";
 import { NeedCard } from "./need-card";
 
 type TimelineRow = {
@@ -48,11 +50,11 @@ function IssueHeader({
         className="inline-flex items-center gap-1.5 text-[12px] font-semibold text-zk-muted transition hover:text-zk-text"
       >
         <ArrowLeft className="h-3.5 w-3.5" aria-hidden="true" />
-        Back to Today
+        Back to dispatch
       </Link>
 
       <div className="flex flex-wrap items-center gap-2">
-        <span className="zk-label">
+        <span className="zk-label zk-num font-normal">
           #{issue.number} · {issue.project}
         </span>
         <Badge tone={statusTone}>{statusLabel}</Badge>
@@ -84,7 +86,7 @@ function IssueHeader({
 }
 
 export function IssueDetail({ number }: { number: number }) {
-  const { ready, state, now } = useDemo();
+  const { ready, state, now, field } = useDemo();
 
   if (!ready || !state) return <PageSkeleton rows={3} />;
 
@@ -200,6 +202,13 @@ export function IssueDetail({ number }: { number: number }) {
 
   const statusTone = needs.length > 0 ? "warn" : claim ? "info" : outcomes.length > 0 ? "ok" : "neutral";
 
+  const index = field?.cells.findIndex((cell) => cell.issue.number === number) ?? -1;
+  const previous = index > 0 ? field?.cells[index - 1] : null;
+  const next =
+    field && index >= 0 && index < field.cells.length - 1
+      ? field.cells[index + 1]
+      : null;
+
   return (
     <div className="mx-auto max-w-[56rem] space-y-6">
       <IssueHeader issue={issue} statusLabel={statusLabel} statusTone={statusTone} />
@@ -218,26 +227,40 @@ export function IssueDetail({ number }: { number: number }) {
         </p>
       )}
 
-      {agent && needs.length === 0 ? (
+      {claim ? (
         <section className="zk-card p-4">
-          <div className="flex flex-wrap items-center gap-3">
-            <AgentIdentity agent={agent} />
-            <div className="ml-auto flex items-center gap-2">
-              <PresenceBadge agent={agent} />
-              <span className="zk-chip">{agent.model}</span>
-            </div>
+          <div className="mb-3 flex flex-wrap items-center gap-3">
+            {agent ? <AgentIdentity agent={agent} compact /> : null}
+            {agent ? (
+              <div className="ml-auto flex items-center gap-2">
+                <PresenceBadge agent={agent} />
+                <span className="zk-chip">{agent.model}</span>
+              </div>
+            ) : null}
           </div>
-          <p className="mt-3 flex items-start gap-2 text-[11px] leading-relaxed text-zk-muted">
-            <Info className="mt-0.5 h-3.5 w-3.5 shrink-0" aria-hidden="true" />
-            {claim
-              ? `Claim state: ${claim.latestLabel}. ${claim.nextStep}.`
-              : `${agent.name} has no claim on this issue right now.`}
-            {claim?.deadline
-              ? ` Due ${formatDateTime(claim.deadline)} (${formatCountdown(claim.deadline, now)}).`
-              : ""}
+
+          <CheckpointReadout claim={claim} now={now} />
+
+          <p className="zk-num mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-zk-muted">
+            <span>{claim.latestLabel}</span>
+            {claim.deadline ? (
+              <span>
+                {formatDateTime(claim.deadline)} ·{" "}
+                {formatCountdown(claim.deadline, now)}
+              </span>
+            ) : null}
+            {claim.cycles && claim.cycles > 1 ? (
+              <span>cycle {claim.cycles}</span>
+            ) : null}
           </p>
         </section>
-      ) : null}
+      ) : (
+        <p className="zk-inset px-4 py-3 text-[12px] leading-relaxed text-zk-muted">
+          {agent
+            ? `${agent.name} holds no claim on this issue.`
+            : "No agent has claimed this issue."}
+        </p>
+      )}
 
       <section>
         <p className="zk-label mb-3">What happened</p>
@@ -274,11 +297,43 @@ export function IssueDetail({ number }: { number: number }) {
         )}
       </section>
 
-      <p className="border-t border-zk-border pt-4 text-[12px]">
-        <Link href="/" className="font-semibold text-zk-accent">
-          Back to the board
-        </Link>
-      </p>
+      <nav
+        className="flex items-stretch justify-between gap-3 border-t border-zk-divider pt-3"
+        aria-label="Neighbouring issues"
+      >
+        {previous ? (
+          <Link
+            href={previous.href}
+            prefetch={false}
+            className="min-w-0 max-w-[48%] text-[12px] text-zk-muted transition hover:text-zk-text"
+          >
+            <span className="zk-num block text-[10px] uppercase tracking-[0.14em]">
+              ← #{previous.issue.number} · {CELL_TEXT[previous.state]}
+            </span>
+            <span className="line-clamp-1">{previous.issue.title}</span>
+          </Link>
+        ) : (
+          <Link
+            href="/"
+            className="text-[12px] font-semibold text-zk-accent hover:underline"
+          >
+            ← Back to dispatch
+          </Link>
+        )}
+
+        {next ? (
+          <Link
+            href={next.href}
+            prefetch={false}
+            className="min-w-0 max-w-[48%] text-right text-[12px] text-zk-muted transition hover:text-zk-text"
+          >
+            <span className="zk-num block text-[10px] uppercase tracking-[0.14em]">
+              #{next.issue.number} · {CELL_TEXT[next.state]} →
+            </span>
+            <span className="line-clamp-1">{next.issue.title}</span>
+          </Link>
+        ) : null}
+      </nav>
     </div>
   );
 }

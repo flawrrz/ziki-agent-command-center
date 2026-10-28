@@ -6,6 +6,7 @@ import { RotateCcw } from "lucide-react";
 import { useDemo } from "@/lib/demo-store";
 import { cn } from "@/lib/cn";
 import { NotificationsButton } from "./notifications";
+import { FilterSheet } from "./filter-sheet";
 import { ThemeToggle } from "./theme-toggle";
 import { ZikiLogo } from "./ziki-logo";
 
@@ -24,20 +25,20 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
       <div className="flex min-h-screen flex-col">
         <header className="sticky top-0 z-40 border-b border-zk-border bg-zk-surface/95 backdrop-blur">
-          <div className="mx-auto flex h-16 w-full max-w-6xl items-center gap-3 px-4 sm:px-6">
+          <div className="mx-auto flex h-14 w-full max-w-[80rem] items-center gap-3 px-4 sm:px-6">
             <ZikiLogo />
 
             <Link
               href="/"
               className={cn(
-                "inline-flex h-9 items-center rounded-full px-3 text-[13px] font-semibold transition",
+                "inline-flex h-8 items-center rounded px-2.5 text-[12px] font-bold uppercase tracking-[0.1em] transition",
                 pathname === "/"
-                  ? "bg-zk-chip text-zk-text"
-                  : "text-zk-text2 hover:bg-zk-hover hover:text-zk-text",
+                  ? "bg-zk-chip text-zk-accent"
+                  : "text-zk-muted hover:bg-zk-hover hover:text-zk-text",
               )}
               aria-current={pathname === "/" ? "page" : undefined}
             >
-              Today
+              Dispatch
             </Link>
 
             {/* The board already leads with this count; only offer the jump elsewhere. */}
@@ -50,25 +51,27 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               </Link>
             ) : null}
 
-            <span
-              className="hidden h-[36px] items-center gap-2 rounded-full border border-zk-border bg-zk-surface px-3 text-[12px] font-semibold text-zk-text lg:inline-flex"
-              title="Active workspace"
-            >
-              <span
-                className="h-1.5 w-1.5 rounded-full bg-zk-ok-fg"
-                aria-hidden="true"
-              />
-              Zedu
-            </span>
-
             <div className="ml-auto flex items-center gap-2">
+              <FilterSheet />
+
+              <span
+                className="hidden h-8 items-center gap-2 rounded border border-zk-border px-2.5 text-[11px] font-bold uppercase tracking-[0.1em] text-zk-text2 lg:inline-flex"
+                title="Active workspace"
+              >
+                <span
+                  className="h-1.5 w-1.5 rounded-full bg-zk-ok-fg"
+                  aria-hidden="true"
+                />
+                Zedu
+              </span>
+
               <ThemeToggle />
               <NotificationsButton />
               <div
-                className="hidden items-center gap-2 rounded-full border border-zk-border bg-zk-surface p-1 pr-3 sm:flex"
+                className="hidden h-8 items-center gap-2 rounded border border-zk-border pl-1 pr-2.5 sm:flex"
                 title="Fawaz Yusuff · Zedu workspace"
               >
-                <span className="zk-avatar h-8 w-8 bg-zk-av-1 text-[11px]">
+                <span className="zk-avatar h-6 w-6 bg-zk-av-1 text-[9px]">
                   FY
                 </span>
                 <span className="text-[12px] font-semibold text-zk-text">
@@ -82,13 +85,13 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         <main
           id="main-content"
           tabIndex={-1}
-          className="mx-auto w-full max-w-6xl flex-1 px-4 py-6 outline-none sm:px-6 sm:py-8"
+          className="mx-auto w-full max-w-[80rem] flex-1 px-4 py-6 outline-none sm:px-6 sm:py-8"
         >
           {children}
         </main>
 
-        <footer className="mx-auto mt-auto w-full max-w-6xl px-4 pb-8 pt-4 sm:px-6">
-          <div className="flex flex-col gap-2 border-t border-zk-border pt-4 text-[11px] leading-relaxed text-zk-muted sm:flex-row sm:items-center sm:justify-between">
+        <footer className="mx-auto w-full max-w-[80rem] px-4 pb-8 pt-4 sm:px-6">
+          <div className="flex flex-col gap-2 border-t border-zk-divider pt-4 text-[11px] leading-relaxed text-zk-muted sm:flex-row sm:items-center sm:justify-between">
             <p>
               Prototype data · stays in this browser · no Ziki API connection.
             </p>

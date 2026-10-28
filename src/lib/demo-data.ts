@@ -7,8 +7,9 @@ import type {
   Outcome,
   WorkspaceUpdate,
 } from "./types";
+import { buildBacklog } from "./backlog";
 
-export const DEMO_STATE_VERSION = 3;
+export const DEMO_STATE_VERSION = 8;
 export const DEMO_STORAGE_KEY = "ziki-agent-command-center:v1";
 
 const MINUTE = 60_000;
@@ -644,14 +645,16 @@ function seedUpdates(now: number): WorkspaceUpdate[] {
 }
 
 export function seedDemoState(now = Date.now()): DemoState {
+  const backlog = buildBacklog(now);
+
   return {
     version: DEMO_STATE_VERSION,
     seededAt: now,
-    agents: seedAgents(now),
-    needs: seedNeeds(now),
-    claims: seedClaims(now),
-    outcomes: seedOutcomes(now),
-    updates: seedUpdates(now),
+    agents: [...seedAgents(now), ...backlog.agents],
+    needs: [...backlog.needs, ...seedNeeds(now)],
+    claims: [...seedClaims(now), ...backlog.claims],
+    outcomes: [...seedOutcomes(now), ...backlog.outcomes],
+    updates: [...seedUpdates(now), ...backlog.updates],
     readNotificationIds: [],
   };
 }

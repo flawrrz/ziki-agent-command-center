@@ -50,7 +50,7 @@ export function NotificationsButton() {
       : feed.filter((item) =>
           filter === "needs" ? item.needsYou : !item.needsYou,
         );
-  const groups = groupFeed(filtered);
+  const groups = groupFeed(filtered).slice(0, 12);
 
   return (
     <div className="relative" ref={containerRef}>
@@ -58,8 +58,8 @@ export function NotificationsButton() {
         type="button"
         onClick={() => setOpen((value) => !value)}
         className={cn(
-          "relative inline-flex h-[38px] w-[38px] items-center justify-center rounded-full border border-zk-border bg-zk-surface text-zk-text2 transition hover:border-zk-border-strong hover:text-zk-text",
-          open && "border-electric-blue/50 text-zk-text",
+          "relative inline-flex h-8 w-8 items-center justify-center rounded border border-zk-border bg-zk-surface text-zk-text2 transition hover:border-zk-border-strong hover:text-zk-text",
+          open && "border-zk-accent text-zk-text",
         )}
         aria-label={
           unreadCount > 0
@@ -71,7 +71,7 @@ export function NotificationsButton() {
       >
         <Bell className="h-4 w-4" aria-hidden="true" />
         {ready && unreadCount > 0 ? (
-          <span className="absolute -right-1 -top-1 inline-flex h-[18px] min-w-[18px] items-center justify-center rounded-full border-2 border-zk-surface bg-electric-blue-strong px-1 text-[9px] font-extrabold text-white">
+          <span className="absolute -right-1 -top-1 inline-flex h-[16px] min-w-[16px] items-center justify-center rounded border-2 border-zk-surface bg-zk-accent px-1 text-[9px] font-extrabold text-zk-on-primary">
             {unreadCount > 99 ? "99+" : unreadCount}
           </span>
         ) : null}
@@ -135,7 +135,7 @@ export function NotificationsButton() {
                 onClick={() => setFilter(tab.id)}
                 aria-pressed={filter === tab.id}
                 className={cn(
-                  "min-h-[30px] rounded-full px-3 text-[12px] transition",
+                  "min-h-[28px] rounded px-3 text-[12px] transition",
                   filter === tab.id
                     ? "bg-zk-surface font-bold text-zk-text shadow-sm"
                     : "font-medium text-zk-text2 hover:text-zk-text",
@@ -171,7 +171,7 @@ export function NotificationsButton() {
               groups.map((group) => (
                 <section
                   key={group.key}
-                  className="mb-1.5 rounded-2xl border border-transparent px-1 py-1 last:mb-0"
+                  className="mb-1.5 rounded border border-transparent px-1 py-1 last:mb-0"
                   aria-label={`Issue ${group.issue.number}`}
                 >
                   <div className="flex items-start justify-between gap-2 px-2.5 py-1.5">
@@ -198,7 +198,7 @@ export function NotificationsButton() {
                           setOpen(false);
                         }}
                         className={cn(
-                          "block rounded-xl border px-2.5 py-2 transition hover:border-zk-border-strong",
+                          "block rounded border px-2.5 py-2 transition hover:border-zk-border-strong",
                           item.needsYou
                             ? "border-zk-dashed bg-zk-seg/70"
                             : "border-transparent hover:bg-zk-chip/60",
@@ -250,7 +250,7 @@ export function NotificationsButton() {
                           </div>
                           {item.unread ? (
                             <span
-                              className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-electric-blue"
+                              className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-zk-accent"
                               aria-label="Unread"
                             />
                           ) : null}

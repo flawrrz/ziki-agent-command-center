@@ -31,6 +31,7 @@ import {
   resolvedNeeds,
   unresolvedNeeds,
 } from "./demo-selectors";
+import { buildField, type Field } from "./board";
 import type {
   Agent,
   Claim,
@@ -58,6 +59,7 @@ type DemoContextValue = {
   claims: Claim[];
   outcomes: Outcome[];
   feed: FeedItem[];
+  field: Field | null;
   unreadCount: number;
   needsCount: number;
   getAgent: (id: string) => Agent | undefined;
@@ -188,6 +190,7 @@ export function DemoProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const feed = useMemo(() => (state ? buildFeed(state) : []), [state]);
+  const field = useMemo(() => (state ? buildField(state) : null), [state]);
   const agents = state?.agents ?? [];
   const claims = state?.claims ?? [];
   const outcomes = state?.outcomes ?? [];
@@ -235,6 +238,7 @@ export function DemoProvider({ children }: { children: React.ReactNode }) {
       claims,
       outcomes,
       feed,
+      field,
       unreadCount: feed.filter((item) => item.unread).length,
       needsCount: openNeeds.length + expired.length,
       getAgent: (id: string) => agents.find((agent) => agent.id === id),
@@ -252,6 +256,7 @@ export function DemoProvider({ children }: { children: React.ReactNode }) {
       claims,
       expired,
       feed,
+      field,
       markAllRead,
       markRead,
       now,
