@@ -8,7 +8,7 @@ import type {
   WorkspaceUpdate,
 } from "./types";
 
-export const DEMO_STATE_VERSION = 1;
+export const DEMO_STATE_VERSION = 2;
 export const DEMO_STORAGE_KEY = "ziki-agent-command-center:v1";
 
 const MINUTE = 60_000;
@@ -65,6 +65,16 @@ export const ISSUES = {
   ),
   dmSearch: issue(612, "Desktop DM search flickers on focus", "Low"),
   roleChips: issue(601, "Settings: role chips overflow on narrow screens", "Low"),
+  threadFeed: issue(
+    655,
+    "Agent feed: collapse repeated claim updates into one thread",
+    "Medium",
+  ),
+  presenceStale: issue(
+    662,
+    "Presence dot stays online for 20 minutes after the last heartbeat",
+    "High",
+  ),
 };
 
 function seedAgents(now: number): Agent[] {
@@ -159,6 +169,59 @@ function seedAgents(now: number): Agent[] {
 
 function seedClaims(now: number): Claim[] {
   return [
+    {
+      id: "claim-655",
+      agentId: "fixit",
+      issue: ISSUES.threadFeed,
+      status: "active",
+      latestLabel: "Writing the patch · 2 files touched",
+      updatedAt: now - 6 * MINUTE,
+      deadline: now + 22 * MINUTE,
+      lastHeartbeat: now - 2 * MINUTE,
+      nextStep: "Delivering unless the window lapses",
+      nextStepTone: "info",
+      events: [
+        {
+          at: now - 38 * MINUTE,
+          label: "Offer accepted",
+          detail: "30-minute delivery window started.",
+        },
+        {
+          at: now - 20 * MINUTE,
+          label: "Draft pushed",
+          detail: "Branch agent/655-collapse-feed-updates opened.",
+        },
+        {
+          at: now - 6 * MINUTE,
+          label: "Heartbeat sent",
+          detail: "Clock unchanged; deliverBy stays fixed.",
+        },
+      ],
+    },
+    {
+      id: "claim-662",
+      agentId: "personal-agent",
+      issue: ISSUES.presenceStale,
+      status: "active",
+      latestLabel: "Reproducing the stale presence window",
+      updatedAt: now - 14 * MINUTE,
+      deadline: now + 96 * MINUTE,
+      lastHeartbeat: now - 4 * MINUTE,
+      nextStep: "Next checkpoint when the patch is pushed",
+      nextStepTone: "neutral",
+      events: [
+        {
+          at: now - 2 * HOUR,
+          label: "Offer accepted",
+          detail: "120-minute delivery window started.",
+        },
+        {
+          at: now - 14 * MINUTE,
+          label: "Reproduction recorded",
+          detail: "Stale window measured at 20 minutes against a 15-minute rule.",
+        },
+      ],
+    },
     {
       id: "claim-721",
       agentId: "bounty-hunter",
