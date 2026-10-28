@@ -8,9 +8,9 @@ export const THEME_COLORS: Record<Theme, string> = {
 };
 
 export function readTheme(): Theme {
-  if (typeof document === "undefined") return "dark";
+  if (typeof document === "undefined") return "light";
 
-  return document.documentElement.dataset.theme === "light" ? "light" : "dark";
+  return document.documentElement.dataset.theme === "dark" ? "dark" : "light";
 }
 
 export function writeTheme(theme: Theme) {
@@ -27,7 +27,7 @@ export function writeTheme(theme: Theme) {
 }
 
 export const THEME_INIT_SCRIPT = `(function(){
-var theme="dark";
+var theme="light";
 try{var saved=window.localStorage.getItem(${JSON.stringify(
   THEME_STORAGE_KEY,
 )});if(saved==="light"||saved==="dark")theme=saved;}catch(e){}

@@ -71,7 +71,7 @@ export function NotificationsButton() {
       >
         <Bell className="h-4 w-4" aria-hidden="true" />
         {ready && unreadCount > 0 ? (
-          <span className="absolute -right-1 -top-1 inline-flex h-[16px] min-w-[16px] items-center justify-center rounded border-2 border-zk-surface bg-zk-accent px-1 text-[9px] font-extrabold text-zk-on-primary">
+          <span className="absolute -right-1 -top-1 inline-flex h-[16px] min-w-[16px] items-center justify-center rounded border-2 border-zk-surface bg-zk-primary px-1 text-[9px] font-extrabold text-zk-on-primary">
             {unreadCount > 99 ? "99+" : unreadCount}
           </span>
         ) : null}

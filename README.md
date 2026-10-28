@@ -32,7 +32,7 @@ Seven hairline cells across the top — `NEED YOU 40 · PAST DUE 15 · RUNNING 8
 
 Progress is a shape, not a paragraph. Every claim renders five segments — `Awarded · Accepted · Draft · Review · Delivered` — filled left to right. In the drill-down the rail gains a readout: `CHECKPOINT 3/5 · DRAFT`, `46% of window`, and a meter that fills as the delivery window drains.
 
-The rail is derived only from events the agent actually reported (`Draft pushed`, `Review requested`, `Fix linked`), so it can never show progress that did not happen. An unrecognised event leaves the stage where it is. Pauses and breaches do not tint the rail — cyan always means machine work, and the clock column carries the breach in red.
+The rail is derived only from events the agent actually reported (`Draft pushed`, `Review requested`, `Fix linked`), so it can never show progress that did not happen. An unrecognised event leaves the stage where it is. Pauses and breaches do not tint the rail — the deeper blue always means machine work, and the clock column carries the breach in red.
 
 ### 4. The field
 
@@ -44,17 +44,19 @@ At this size the only usable index is a box. ⌘K or `/` opens a native `<dialog
 
 ## Visual language
 
-Deliberately not Ziki's blue card system. This is a dispatch console: warm near-black (`#0a0908`) or warm paper (`#f3efe6`), one accent per job, hairline rules instead of elevation, and tabular numerals for anything countable.
+Ziki's own blue palette — cool paper (`#f5f7fb`) by default, navy (`#070f22`) in dark mode — wearing a dispatch console's structure: hairline rules instead of heavy elevation, square avatars, tabular numerals for anything countable, and one hue per job.
 
 | Colour | Job |
 | --- | --- |
-| Amber `#ffb020` | a human decision is outstanding |
-| Cyan `#56d3e0` | machine work in flight |
-| Red `#ff6a4d` | a clock has run past |
-| Green `#67d49a` | delivered |
-| Warm grey | everything that is only history |
+| Accent blue `#8fc9ff` dark / `#1f5fd8` light | a human decision is outstanding |
+| Electric blue `#4f8dff` dark / azure `#0369a1` light | machine work in flight |
+| Red | a clock has run past |
+| Green | delivered |
+| Slate grey | everything that is only history |
 
-Type does the structuring: 10px uppercase labels at 0.16em tracking for column heads, 22px numerals in the ledger, 15px body. Radius is 6px, avatars are square, and there is no shadow anywhere. Every colour is declared once in `src/app/globals.css` (`:root` and `[data-theme="light"]`) and reaches Tailwind through `@theme inline`, so components only reference tokens.
+Type does the structuring: 10px uppercase labels at 0.16em tracking for column heads, 22px numerals in the ledger, 15px body. Radius is 6px and avatars are square. **Light is the default**; the header toggle switches to navy, and the choice is remembered under `ziki-agent-command-center:theme` and applied by an inline script before first paint, so there is no flash and the `theme-color` meta stays in sync.
+
+Every colour is declared once in `src/app/globals.css` (`:root` holds dark, `[data-theme="light"]` overrides it) and reaches Tailwind through `@theme inline`, so components only reference tokens and a new theme is a palette change rather than a rewrite.
 
 ## Demo data
 
