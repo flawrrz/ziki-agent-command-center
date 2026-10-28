@@ -514,26 +514,49 @@
     letter-spacing: -0.03em;
   }
 
-  /* Checkpoint rail: five segments, one per reported checkpoint. */
+  /* Checkpoint rail: five numbered cells, one per reported checkpoint. */
   .zk-rail {
     display: flex;
     align-items: center;
-    gap: 2px;
+    gap: 1px;
   }
 
   .zk-rail-seg {
     flex: 1 1 0;
-    min-width: 4px;
-    height: 5px;
-    background-color: var(--zk-seg);
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 12px;
+    border: 1px solid transparent;
+    border-radius: 2px;
+    font-size: 8px;
+    line-height: 1;
+    color: color-mix(in srgb, var(--zk-muted) 60%, transparent);
   }
 
   .zk-rail-seg[data-state="done"] {
+    background-color: color-mix(in srgb, var(--zk-info-fg) 16%, transparent);
+    color: var(--zk-info-fg);
+  }
+
+  /* The stage the agent is standing on: solid, so it is findable without
+     counting, and in the surface colour so it survives both themes. */
+  .zk-rail-seg[data-state="current"] {
     background-color: var(--zk-info-fg);
+    color: var(--zk-surface);
+    font-weight: 700;
   }
 
   .zk-rail-seg[data-state="ok"] {
+    background-color: color-mix(in srgb, var(--zk-ok-fg) 16%, transparent);
+    color: var(--zk-ok-fg);
+  }
+
+  .zk-rail-seg[data-state="ok"]:last-child {
     background-color: var(--zk-ok-fg);
+    color: var(--zk-surface);
+    font-weight: 700;
   }
 
   /* Consumption meter: how much of the delivery window is gone. */

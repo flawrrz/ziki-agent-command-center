@@ -9,7 +9,7 @@ import type {
 } from "./types";
 import { buildBacklog } from "./backlog";
 
-export const DEMO_STATE_VERSION = 8;
+export const DEMO_STATE_VERSION = 12;
 export const DEMO_STORAGE_KEY = "ziki-agent-command-center:v1";
 
 const MINUTE = 60_000;

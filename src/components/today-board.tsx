@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useDemo } from "@/lib/demo-store";
 import { buildBoard, type BoardCard } from "@/lib/board";
+import { CHECKPOINTS } from "@/lib/progress";
 import { readLastSeen, writeLastSeen } from "@/lib/last-seen";
 import { formatDuration } from "@/lib/format";
 import { cn } from "@/lib/cn";
@@ -14,16 +15,23 @@ import { IssueField } from "./issue-field";
 
 const CAP = { need: 6, running: 10, shipped: 6 };
 
+/* Stated once so the numbered rail cells need no per-row caption. */
+const RAIL_LEGEND = CHECKPOINTS.map(
+  (checkpoint, index) => `${index + 1} ${checkpoint.label.toLowerCase()}`,
+).join(" · ");
+
 function SectionTitle({
   id,
   label,
   count,
   marker,
+  note,
 }: {
   id: string;
   label: string;
   count: number;
   marker: string;
+  note?: string;
 }) {
   return (
     <h2
@@ -33,6 +41,10 @@ function SectionTitle({
       <span className={cn("h-2 w-2 shrink-0 self-center", marker)} aria-hidden="true" />
       <span className="zk-label">{label}</span>
       <span className="zk-num text-[13px] font-bold text-zk-text">{count}</span>
+      {/* The rail legend is stated once here rather than guessed at on every row. */}
+      {note ? (
+        <span className="ml-auto hidden text-[10px] text-zk-muted md:inline">{note}</span>
+      ) : null}
     </h2>
   );
 }
@@ -51,6 +63,8 @@ function Rows({
   emptyNote: string;
 }) {
   if (cards.length === 0) {
+    if (!emptyNote) return null;
+
     return <p className="py-3 text-[13px] text-zk-muted">{emptyNote}</p>;
   }
 
@@ -92,28 +106,45 @@ export function TodayBoard() {
     null,
   );
 
-  const sections = [
+  const sections: {
+    id: string;
+    label: string;
+    marker: string;
+    cards: BoardCard[];
+    count: number;
+    cap: number;
+    empty: string;
+    note?: string;
+  }[] = [
     {
       id: "need",
       label: "Need you",
       marker: "bg-zk-accent",
       cards: board.waiting.slice(1),
+      /* The lead item is on screen too, as the focus card above, so the header
+         has to count it or the two NEED YOU numbers disagree. */
+      count: board.waiting.length,
       cap: CAP.need,
-      empty: "Nothing is waiting on a decision.",
+      /* With a single live need the focus card is the whole section, so the
+         list must not claim nothing is waiting. */
+      empty: board.waiting.length === 0 ? "Nothing is waiting on a decision." : "",
     },
     {
       id: "running",
       label: "Agent working",
       marker: "bg-zk-info-fg",
       cards: board.running,
+      count: board.running.length,
       cap: CAP.running,
       empty: "No agent holds a claim right now.",
+      note: RAIL_LEGEND,
     },
     {
       id: "shipped",
       label: "Delivered",
       marker: "bg-zk-ok-fg",
       cards: board.shipped,
+      count: board.shipped.length,
       cap: CAP.shipped,
       empty: "Nothing has landed in this workspace yet.",
     },
@@ -158,7 +189,11 @@ export function TodayBoard() {
 
       {sections.map((section) => {
         const limit = expanded[section.id] ?? section.cap;
-        const hidden = section.cards.length - limit;
+        /* Rows shown outside the list — the focus card — so the expand control
+           and the header count the same set. */
+        const off = section.count - section.cards.length;
+        const shown = Math.min(limit + off, section.count);
+        const hidden = section.count - shown;
 
         return (
           <section
@@ -170,8 +205,9 @@ export function TodayBoard() {
             <SectionTitle
               id={section.id}
               label={section.label}
-              count={section.cards.length}
+              count={section.count}
               marker={section.marker}
+              note={section.note}
             />
 
             <Rows
@@ -198,7 +234,7 @@ export function TodayBoard() {
               >
                 Show {Math.min(hidden, section.cap * 3)} more
                 <span className="zk-num opacity-60">
-                  {limit}/{section.cards.length}
+                  {shown}/{section.count}
                 </span>
               </button>
             ) : null}

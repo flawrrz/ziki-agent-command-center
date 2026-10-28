@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Check } from "lucide-react";
-import { cardWindow, type BoardCard } from "@/lib/board";
+import { type BoardCard } from "@/lib/board";
 import { claimProgress, CHECKPOINTS } from "@/lib/progress";
 import { formatDuration, formatRelative, initials } from "@/lib/format";
 import { cn } from "@/lib/cn";
@@ -32,11 +32,12 @@ export function QueueRow({
   now: number;
   isNew: boolean;
 }) {
-  const window = cardWindow(card);
   const clock = clockText(card, now);
   const claim = card.claim;
   const progress = claim ? claimProgress(claim, now) : null;
-  const late = card.overdue || progress?.stalled;
+  const stage = progress?.stage ?? -1;
+  const stageCode = progress && stage >= 0 ? CHECKPOINTS[stage].code : "—";
+  const late = card.overdue || Boolean(progress?.stalled);
 
   return (
     <li className="border-b border-zk-divider last:border-b-0">
@@ -84,11 +85,22 @@ export function QueueRow({
         ) : null}
 
         {claim && card.rail === "running" ? (
-          <CheckpointRail
-            claim={claim}
-            now={now}
-            className="hidden w-[64px] shrink-0 sm:flex"
-          />
+          <>
+            <CheckpointRail
+              claim={claim}
+              now={now}
+              className="hidden w-[64px] shrink-0 sm:flex"
+            />
+            {/* Where there is room, name the stage instead of leaving it to the
+                legend. Below sm the five cells would be unreadable, so the row
+                falls back to the count. */}
+            <span className="hidden w-[26px] shrink-0 text-[10px] font-bold tracking-[0.04em] text-zk-info-fg xl:inline">
+              {stageCode}
+            </span>
+            <span className="zk-num w-[30px] shrink-0 text-right text-[10px] text-zk-info-fg sm:hidden">
+              {stage < 0 ? "0/5" : `${stage + 1}/5`}
+            </span>
+          </>
         ) : null}
 
         <span
@@ -96,11 +108,6 @@ export function QueueRow({
             "zk-num shrink-0 whitespace-nowrap text-right text-[11px] sm:w-[62px]",
             late ? "font-bold text-zk-bad-fg" : "text-zk-muted",
           )}
-          title={
-            window
-              ? `Checkpoint ${Math.max(0, (progress?.stage ?? -1) + 1)} of ${CHECKPOINTS.length}`
-              : undefined
-          }
         >
           {card.rail === "shipped" ? (
             <Check className="ml-auto h-3 w-3 text-zk-ok-fg" aria-hidden="true" />

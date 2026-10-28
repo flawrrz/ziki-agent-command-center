@@ -22,15 +22,15 @@ A list is only a good list while it is short. At 991 issues the honest options a
 
 ### 1. Ledger
 
-Seven hairline cells across the top — `NEED YOU 40 · PAST DUE 15 · RUNNING 94 · DELIVERED 296 · RELEASED 173 · NO AGENT 373 · BACKLOG 991` — each a link to the section that holds those rows. Every cell counts **issues**, never requests or claims, so the six state cells always sum to the seventh; `NEED YOU` is the number of issues waiting on a human, not the number of asks on them. The counts cover the whole backlog, not the slice on screen, and they come from the same one-per-issue selector that draws the field, so a number and its cells can never disagree.
+Seven hairline cells across the top — `NEED YOU 40 · PAST DUE 11 · RUNNING 98 · DELIVERED 296 · RELEASED 173 · NO AGENT 373 · ALL ISSUES 991` — each a link to the section that holds those rows. Every cell counts **issues**, never requests or claims, so the six state cells always sum to the seventh; `NEED YOU` is the number of issues waiting on a human, not the number of asks on them. The last cell is a denominator, not a state, which is why it reads **All issues** rather than *backlog* — "backlog" would collide with `NO AGENT` and claim delivered work as unfinished. The counts cover the whole corpus, not the slice on screen, and they come from the same one-per-issue selector that draws the field, so a number and its cells can never disagree.
 
 ### 2. Bounded queues
 
-`Need you` → `Agent working` → `Delivered`, capped at 6, 10 and 6 rows. "Show 30 more" grows a section by three caps and prints `10/109` so you always know the size of what you have not read. Rows are fixed columns: state marker, issue number, agent, a few words, checkpoint rail, clock, verb. An issue appears once; if it needs a decision it is only under **Need you**.
+`Need you` → `Agent working` → `Delivered`, capped at 6, 10 and 6 rows. "Show 30 more" grows a section by three caps and prints `10/109` so you always know the size of what you have not read. The most urgent need is drawn larger, as the focus card above the lists, and is still counted in `NEED YOU` and in its `7/40` — one set, one number. Rows are fixed columns: state marker, issue number, agent, a few words, checkpoint rail, clock, verb. An issue appears once; if it needs a decision it is only under **Need you**.
 
 ### 3. Checkpoint rails
 
-Progress is a shape, not a paragraph. Every claim renders five segments — `Awarded · Accepted · Draft · Review · Delivered` — filled left to right. In the drill-down the rail gains a readout: `CHECKPOINT 3/5 · DRAFT`, `46% of window`, and a meter that fills as the delivery window drains.
+Progress is a shape, not a paragraph. Every claim renders five **numbered** cells — `1 awarded · 2 accepted · 3 draft · 4 review · 5 delivered` — where passed cells are tinted and the cell the agent is actually on is solid. Numbering them is what makes them readable: five unlabelled rectangles ask the reader to decode a code, five digits answer on their own. The legend is stated once, in the `AGENT WORKING` header, rather than as a caption on 109 rows; each row adds a three-letter stage code (`ACC`, `DRF`, `REV`) at wide viewports and falls back to `3/5` below `sm`. In the drill-down the rail gains a readout: `CHECKPOINT 3/5 · DRAFT`, `46% of window`, and a meter that fills as the delivery window drains. Screen readers get `Checkpoint 4 of 5 · Review` as the rail's own label.
 
 The rail is derived only from events the agent actually reported (`Draft pushed`, `Review requested`, `Fix linked`), so it can never show progress that did not happen. An unrecognised event leaves the stage where it is. Pauses and breaches do not tint the rail — the deeper blue always means machine work, and the clock column carries the breach in red.
 
@@ -62,14 +62,17 @@ Every colour is declared once in `src/app/globals.css` (`:root` holds dark, `[da
 
 `src/lib/backlog.ts` mints the long tail with a seeded mulberry32 PRNG, so every machine and every reload sees the same 980 issues (#1300 up), 13 extra agents, 128 running, 296 completed and 172 released claims, plus 34 open needs. Determinism matters here: a design review cannot judge density if the density moves.
 
-Two rules keep the prototype honest:
+Three rules keep the prototype honest:
 
 - **Needs are derived from claims.** A stale-claim, question or gate need always points at a real claim held by the same agent, so the drill-down can never contradict the board. Offers are the exception — an offer means no claim exists yet, so those sit on untouched issues.
+- **A breach is built backwards.** For a past-due claim the due date is placed behind `now` and the window opens before it; for a healthy claim the due date is still ahead. Deriving both from `now - window` produced rows that said "past due" while their clock counted up.
 - **The long tail never enters `localStorage`.** Issues are read from a module-level pool; only claims, needs, outcomes and the last 40 updates persist (~660KB for 600 claims). The feed caps its update list and indexes read notifications with a `Set`.
 
 State is seeded relative to the moment you first open the app, under `ziki-agent-command-center:v1`. A 30-second tick keeps timers and presence honest; `DEMO_STATE_VERSION` reseeds returning visitors when the model changes. **Reset demo** in the footer clears and reseeds. Last-visit timestamp lives under `:seen`, theme under `:theme`.
 
-The simulated rules mirror the live product: offers expire after 30 minutes, accepted claims carry a 15- or 60-minute due date, heartbeats within 15 minutes read online (15–60 idle, over 60 offline), and unanswered questions release a claim after 4 hours. All actions (answer, accept, pass, approve, decline, release, extend, re-offer, pause/resume) run client-side against the same shared state, so the ledger, the queues, the field and the notification tray re-derive together.
+Delivery windows are sized so the board ages at a readable rate: 90 minutes to 6 hours on critical issues, 5 hours to 2 days otherwise, and 1–6 hours for the claims already past due. A short window looks more dramatic for a screenshot but reads as noise in a live tab — at 15 minutes the board turns red every minute, so nobody finishes reading it. On a fresh seed about 40 issues need you and the median claim has roughly 9 hours left; leaving the tab open for 90 seconds moves the counts by nothing.
+
+The simulated rules mirror the live product: offers expire after 30 minutes, heartbeats within 15 minutes read online (15–60 idle, over 60 offline), and unanswered questions release a claim after 4 hours. All actions (answer, accept, pass, approve, decline, release, extend, re-offer, pause/resume) run client-side against the same shared state, so the ledger, the queues, the field and the notification tray re-derive together.
 
 ## Routes
 
@@ -129,16 +132,16 @@ No `vercel.json` is required.
 ```text
 src/
   app/
-    page.tsx                 dispatch board
+    page.tsx                 the dashboard
     issue/[number]/page.tsx  issue drill-down
     globals.css              palette, tokens and component classes
     layout.tsx               theme pre-paint, shell, providers
   components/
     today-board.tsx          masthead, ledger, bounded sections
-    ledger.tsx               seven whole-backlog counts, each a jump link
+    ledger.tsx               seven whole-corpus counts, each a jump link
     focus-card.tsx           the one decision, at reading size, with its verbs
     queue-row.tsx            one line: marker, number, agent, words, rail, clock
-    checkpoint-rail.tsx      five-segment rail and its drill-down readout
+    checkpoint-rail.tsx      numbered rail and its drill-down readout
     issue-field.tsx          dot matrix, one cell per issue
     filter-sheet.tsx         ⌘K / "/" search over the whole corpus
     issue-detail.tsx         drill-down view with neighbour navigation
@@ -166,9 +169,9 @@ src/
 ## Accessibility and responsiveness
 
 - Skip link, visible focus styles, and `prefers-reduced-motion` support that drops the cell hover scale. There is no ambient animation; the rails and the field are static shapes.
-- Native `<dialog>` for search and for destructive confirmations; `aria-label`s carry the cell and rail state as text, so colour is never the only channel.
+- Native `<dialog>` for search and for destructive confirmations; `aria-label`s carry the cell and rail state as text — a rail announces `Checkpoint 4 of 5 · Review` — so colour is never the only channel.
 - Each row is a single link, so the whole line is one tab stop and one tap target; clocks are real text.
-- Checked at 390px and 1440px in both themes with no horizontal overflow: the ledger collapses to two columns, rails hide below `sm`, the search box becomes an icon button, and the field rewraps to ~13 columns per band.
+- Checked at 390px and 1440px in both themes with no horizontal overflow: the ledger collapses to two columns, the numbered rail swaps to a `3/5` figure below `sm` and drops its stage code below `xl`, the search box becomes an icon button, and the field rewraps to ~13 columns per band.
 
 ## Scope and limitations
 

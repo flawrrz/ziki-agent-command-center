@@ -52,12 +52,14 @@ export function Ledger({
         </Link>
       ))}
 
+      {/* Not a state: the denominator the six cells above add up to. "Backlog"
+          would collide with NO AGENT and claim delivered work as unfinished. */}
       <div className="zk-ledger-cell justify-between">
-        <span className="zk-label">Backlog</span>
+        <span className="zk-label">All issues</span>
         <span className="zk-num text-[22px] font-bold leading-none text-zk-text2">
           {field.total}
         </span>
-        <span className="text-[10px] text-zk-muted">issues tracked</span>
+        <span className="text-[10px] text-zk-muted">every state counted</span>
       </div>
     </nav>
   );

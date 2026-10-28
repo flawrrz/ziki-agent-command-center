@@ -253,13 +253,30 @@ function buildClaims(
 
     const agent = pick(random, agents);
     const stage = 2 + Math.floor(random() * 4);
-    const windowMinutes = issue.priority === "Critical" ? 120 : random() < 0.5 ? 15 : 60;
-    const elapsed = Math.floor(random() * windowMinutes * 60_000);
-    const acceptedAt = now - elapsed;
-    const deadline = acceptedAt + windowMinutes * MINUTE;
     const late = random() < 0.14;
-    /* Breaches should read as a spread of clocks, not one synchronized cluster. */
-    const overBy = Math.floor(random() * 5 * HOUR) + 12 * MINUTE;
+    /* Healthy windows run from an hour and a half to two days. A 15-minute window
+       means an untouched tab files a new request every minute and the board turns
+       red before anyone has read it. Breaches stay short — nobody holds a two-day
+       claim and calls it twenty minutes late. */
+    const windowMinutes = late
+      ? 60 + Math.floor(random() * 300)
+      : issue.priority === "Critical"
+        ? 90 + Math.floor(random() * 270)
+        : 300 + Math.floor(random() * 2580);
+    const window = windowMinutes * MINUTE;
+    /* A breach's due date sits behind `now` and its window opens before that
+       date; a healthy claim's due date is still ahead. Getting this backwards
+       makes the row say "overdue" while its clock counts up. */
+    let deadline;
+    let acceptedAt;
+
+    if (late) {
+      deadline = now - (Math.floor(random() * 5 * HOUR) + 12 * MINUTE);
+      acceptedAt = deadline - Math.floor(window * (0.3 + random() * 0.6));
+    } else {
+      acceptedAt = now - Math.floor(random() * window * 0.9);
+      deadline = acceptedAt + window;
+    }
 
     const work = pick(random, [
       "Writing the patch",
@@ -277,14 +294,16 @@ function buildClaims(
       /* The clock column carries the breach, so the label stays the work. */
       latestLabel: work,
       updatedAt: now - Math.floor(random() * 30) * MINUTE,
-      deadline: late ? deadline - overBy : deadline,
+      deadline,
       lastHeartbeat: now - Math.floor(random() * 50) * MINUTE,
       nextStep: late
         ? "Release the claim or extend by 60 minutes"
         : "Link a fix before the due date",
       nextStepTone: late ? "bad" : "info",
       cycles: 1 + Math.floor(random() * 3),
-      events: chainFor(stage, acceptedAt, now - MINUTE),
+      /* A breach means the agent went quiet, so its evidence stops at the due
+         date rather than continuing past it. */
+      events: chainFor(stage, acceptedAt, late ? deadline - MINUTE : now - MINUTE),
     });
   }
 

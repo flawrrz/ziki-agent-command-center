@@ -3,14 +3,15 @@ import type { Claim, ClaimStatus } from "./types";
 /**
  * The five checkpoints every claim can reach, in order. Labels are matched
  * against real event text so the rail never invents progress the agent did not
- * report; an unrecognised event simply leaves the stage where it is.
+ * report; an unrecognised event simply leaves the stage where it is. `code` is
+ * the three-letter form the row rail prints when there is room for it.
  */
 export const CHECKPOINTS = [
-  { id: "awarded", label: "Awarded", match: ["bid awarded"] },
-  { id: "accepted", label: "Accepted", match: ["offer accepted", "accepted the offer"] },
-  { id: "draft", label: "Draft", match: ["draft pushed", "patch pushed", "branch opened"] },
-  { id: "review", label: "Review", match: ["review requested", "review cleared", "reproduction recorded"] },
-  { id: "delivered", label: "Delivered", match: ["fix linked", "delivered", "merged"] },
+  { id: "awarded", label: "Awarded", code: "AWD", match: ["bid awarded"] },
+  { id: "accepted", label: "Accepted", code: "ACC", match: ["offer accepted", "accepted the offer"] },
+  { id: "draft", label: "Draft", code: "DRF", match: ["draft pushed", "patch pushed", "branch opened"] },
+  { id: "review", label: "Review", code: "REV", match: ["review requested", "review cleared", "reproduction recorded"] },
+  { id: "delivered", label: "Delivered", code: "DLV", match: ["fix linked", "delivered", "merged"] },
 ] as const;
 
 export type CheckpointId = (typeof CHECKPOINTS)[number]["id"];
