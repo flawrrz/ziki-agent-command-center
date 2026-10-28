@@ -31,7 +31,7 @@ function clock(card: BoardCard, now: number) {
   if (!card.deadline) {
     return {
       value: formatDuration(now - need.createdAt),
-      unit: need.kind === "question" ? "waiting on you" : "no deadline",
+      unit: need.kind === "question" ? "waiting on you" : "no due date set",
       bad: false,
     };
   }
@@ -39,7 +39,7 @@ function clock(card: BoardCard, now: number) {
   const diff = card.deadline - now;
 
   if (diff < 0) {
-    return { value: formatDuration(-diff), unit: "past deliverBy", bad: true };
+    return { value: formatDuration(-diff), unit: "past the due date", bad: true };
   }
 
   const unit =

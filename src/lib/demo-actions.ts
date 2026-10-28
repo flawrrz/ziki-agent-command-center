@@ -190,7 +190,7 @@ export function applyNeedAction(
                 latestLabel: "Working the accepted offer",
                 updatedAt: at,
                 deadline,
-                nextStep: "Link a fix before the delivery deadline",
+                nextStep: "Link a fix before the due date",
                 nextStepTone: "info" as const,
                 events: [
                   ...claim.events,
@@ -587,7 +587,7 @@ export function expireTimedNeeds(
       return {
         ...claim,
         status: "overdue" as const,
-        latestLabel: "Delivery deadline passed · claim still held",
+        latestLabel: "Due date passed · claim still held",
         updatedAt: at,
         nextStep: "Release the claim or extend by 60 minutes",
         nextStepTone: "bad" as const,
@@ -595,7 +595,7 @@ export function expireTimedNeeds(
           ...claim.events,
           {
             at,
-            label: "Delivery deadline passed",
+            label: "Due date passed",
             detail: "No linked fix. The claim still occupies a slot.",
           },
         ],
@@ -627,13 +627,13 @@ export function expireTimedNeeds(
         issue: claim.issue,
         title: `Deadline passed, but ${agent?.name ?? "an agent"} still holds #${claim.issue.number}`,
         detail:
-          "The delivery deadline passed while the claim was active. The claim still occupies a slot and the issue cannot be re-offered until you release or extend it.",
+          "The due date passed while the claim was active. The claim still occupies a slot and the issue cannot be re-offered until you release or extend it.",
         context: [
           `${claim.issue.priority} priority · delivery window elapsed`,
           "No linked fix was recorded",
           "A claim slot stays blocked until this is resolved",
         ],
-        rule: "Heartbeats keep a claim alive but do not move deliverBy. A claim past its deadline with no linked fix is released and re-offered.",
+        rule: "Heartbeats keep a claim alive but do not move the due date. A claim past its due date with no linked fix is released and re-offered.",
         status: "open" as const,
         createdAt: at,
       };

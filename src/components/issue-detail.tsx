@@ -146,7 +146,9 @@ export function IssueDetail({ number }: { number: number }) {
           at: event.at,
           label: event.label,
           detail: event.detail,
-          tone: /deadline passed|not recorded|overdue|released/i.test(event.label)
+          tone: /(deadline|due date) passed|not recorded|overdue|released/i.test(
+            event.label,
+          )
             ? ("bad" as const)
             : ("neutral" as const),
           actor: agent?.name ?? "Agent",
@@ -231,7 +233,7 @@ export function IssueDetail({ number }: { number: number }) {
               ? `Claim state: ${claim.latestLabel}. ${claim.nextStep}.`
               : `${agent.name} has no claim on this issue right now.`}
             {claim?.deadline
-              ? ` DeliverBy ${formatDateTime(claim.deadline)} (${formatCountdown(claim.deadline, now)}).`
+              ? ` Due ${formatDateTime(claim.deadline)} (${formatCountdown(claim.deadline, now)}).`
               : ""}
           </p>
         </section>

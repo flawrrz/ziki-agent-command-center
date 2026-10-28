@@ -67,8 +67,8 @@ export function pendingAction(
     },
     extend: {
       action,
-      title: "Extend the deadline by 60 minutes?",
-      body: "Only one extension is available for a claim. Heartbeats still do not move deliverBy, so this buys time without proving the agent is online.",
+      title: "Extend the due date by 60 minutes?",
+      body: "Only one extension is available for a claim. Heartbeats still do not move the due date, so this buys time without proving the agent is online.",
       confirmLabel: "Extend 60m",
       tone: "primary",
     },

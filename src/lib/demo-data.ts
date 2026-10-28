@@ -89,7 +89,7 @@ function seedAgents(now: number): Agent[] {
       presence: "offline",
       lastHeartbeat: now - 2 * HOUR - 23 * MINUTE,
       lastAction: {
-        label: "Delivery deadline passed on #721",
+        label: "Due date passed on #721",
         issueNumber: 721,
         at: now - HOUR - 30 * MINUTE,
       },
@@ -194,7 +194,7 @@ function seedClaims(now: number): Claim[] {
         {
           at: now - 6 * MINUTE,
           label: "Heartbeat sent",
-          detail: "Clock unchanged; deliverBy stays fixed.",
+          detail: "Clock unchanged; the due date stays fixed.",
         },
       ],
     },
@@ -227,7 +227,7 @@ function seedClaims(now: number): Claim[] {
       agentId: "bounty-hunter",
       issue: ISSUES.refresh,
       status: "overdue",
-      latestLabel: "Delivery deadline passed · claim still held",
+      latestLabel: "Due date passed · claim still held",
       updatedAt: now - HOUR - 20 * MINUTE,
       deadline: now - HOUR - 30 * MINUTE,
       lastHeartbeat: now - HOUR - 45 * MINUTE,
@@ -242,11 +242,11 @@ function seedClaims(now: number): Claim[] {
         {
           at: now - HOUR - 45 * MINUTE,
           label: "Heartbeat sent",
-          detail: "Heartbeats keep the claim alive but do not move deliverBy.",
+          detail: "Heartbeats keep the claim alive but do not move the due date.",
         },
         {
           at: now - HOUR - 30 * MINUTE,
-          label: "Delivery deadline passed",
+          label: "Due date passed",
           detail: "No linked fix.",
         },
         {
@@ -443,13 +443,13 @@ function seedNeeds(now: number): NeedItem[] {
       issue: ISSUES.refresh,
       title: "Deadline passed, but Bounty Hunter still holds #721",
       detail:
-        "The delivery deadline passed while heartbeats had stopped, yet the claim is still active and the issue cannot be re-offered.",
+        "The due date passed while heartbeats had stopped, yet the claim is still active and the issue cannot be re-offered.",
       context: [
         "High priority · 60-minute delivery window",
         "Heartbeat stopped before the deadline",
         "A claim slot stays blocked until this is resolved",
       ],
-      rule: "Heartbeats keep a claim alive but do not move deliverBy. A claim past its deadline with no linked fix is released and re-offered.",
+      rule: "Heartbeats keep a claim alive but do not move the due date. A claim past its due date with no linked fix is released and re-offered.",
       status: "open",
       createdAt: now - HOUR - 20 * MINUTE,
     },
@@ -460,7 +460,7 @@ function seedNeeds(now: number): NeedItem[] {
       issue: ISSUES.areaPreferences,
       title: "Offer waiting: Personal agent can take #640",
       detail:
-        "The 30-minute offer window is open. Accepting starts a 15-minute delivery deadline; passing re-offers the issue to the next eligible person.",
+        "The 30-minute offer window is open. Accepting sets a 15-minute due date; passing re-offers the issue to the next eligible person.",
       context: [
         "0 of 2 active claims",
         "Lightest workload among 3 eligible people",
@@ -597,7 +597,7 @@ function seedUpdates(now: number): WorkspaceUpdate[] {
       actorRole: "Contributor",
       ownerName: "Fawaz Yusuff",
       title: "Heartbeat stopped",
-      detail: "No API activity for 1h 45m while a delivery deadline was active.",
+      detail: "No API activity for 1h 45m before the due date.",
       at: now - HOUR - 45 * MINUTE,
     },
     {

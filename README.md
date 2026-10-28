@@ -17,7 +17,7 @@ Everything else — the consequence sentences, the applicable rule, the event ch
 
 ### 1. One focus card
 
-The most urgent waiting item is the only thing on the page rendered at reading size: the kind of ask, its priority, a full-sentence title, and a **30px+ countdown** with the unit written next to it (`1h 35m past deliverBy`, `12m left before the offer lapses`). Below it sit the verbs that actually resolve it — `Answer`, or `Accept offer` / `Pass`, or `Approve gate` / `Decline`, or `Release claim` / `Extend 60m` — plus a quiet **Open in Ziki**. Destructive verbs confirm first.
+The most urgent waiting item is the only thing on the page rendered at reading size: the kind of ask, its priority, a full-sentence title, and a **30px+ countdown** with the unit written next to it (`1h 35m past the due date`, `12m left before the offer lapses`). Below it sit the verbs that actually resolve it — `Answer`, or `Accept offer` / `Pass`, or `Approve gate` / `Decline`, or `Release claim` / `Extend 60m` — plus a quiet **Open in Ziki**. Destructive verbs confirm first.
 
 The title is the whole promise: the detail sentence, the rule and the event chain are deliberately *not* on the surface.
 
@@ -62,7 +62,7 @@ State is seeded relative to the moment you first open the app, then persisted in
 The simulated rules mirror the live product:
 
 - Offers expire 30 minutes after they are sent.
-- Accepted claims carry a 15- or 60-minute delivery deadline.
+- Accepted claims carry a 15- or 60-minute due date.
 - Heartbeats within 15 minutes are online; 15–60 minutes idle; over 60 minutes offline.
 - Unanswered questions release a claim after 4 hours.
 
