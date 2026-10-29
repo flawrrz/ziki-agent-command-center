@@ -18,7 +18,7 @@ A list is only a good list while it is short. At 991 issues the honest options a
 | Bounded queues + "Show N more" | infinite scroll | what do I act on first |
 | Checkpoint rails | status prose | how far did the agent actually get |
 | Dot matrix ("the field") | a table of 991 rows | where is the backlog, as one shape |
-| ⌘K / `/` sheet | filters and facets | find any issue by number, title or agent |
+| ⌘K / Ctrl K sheet | filters and facets | find any issue by number, title or agent |
 
 ### 1. Ledger
 
@@ -40,7 +40,7 @@ One square per issue, banded by state, so ~1000 rows cost about 300px of height 
 
 ### 5. Search
 
-At this size the only usable index is a box. ⌘K or `/` opens a native `<dialog>` over the whole corpus — not the page — filterable by state, paged 40 at a time, arrow keys to move, enter to open. The footer reads `18 matches · showing 18`, so the slice is never mistaken for the set.
+At this size the only usable index is a box. ⌘K on a Mac, Ctrl K elsewhere, or `/` opens a native `<dialog>` over the whole corpus — not the page — filterable by state, paged 40 at a time, arrow keys to move, enter to open. The header chip prints the shortcut the visitor's platform actually uses. The footer reads `18 matches · showing 18`, so the slice is never mistaken for the set.
 
 ## Visual language
 

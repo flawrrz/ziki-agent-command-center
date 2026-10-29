@@ -43,6 +43,13 @@ export function FilterSheet() {
   const [filter, setFilter] = useState<CellState | "all">("all");
   const [active, setActive] = useState(0);
   const [limit, setLimit] = useState(PAGE);
+  /* "Ctrl" is what the server draws, so hydration never disagrees with itself;
+     the glyph swap on a Mac keyboard happens one frame later. */
+  const [shortcut, setShortcut] = useState("Ctrl K");
+
+  useEffect(() => {
+    if (/Mac|iPhone|iPad|iPod/.test(navigator.platform)) setShortcut("⌘K");
+  }, []);
 
   const results = useMemo(() => {
     if (!field) return [];
@@ -98,8 +105,8 @@ export function FilterSheet() {
       >
         <Search className="h-3.5 w-3.5" aria-hidden="true" />
         <span>Find an issue</span>
-        <kbd className="zk-num ml-2 rounded border border-zk-border px-1 text-[10px]">
-          ⌘K
+        <kbd className="zk-num rounded border border-zk-border px-1.5 py-0.5 text-[10px] leading-none">
+          {shortcut}
         </kbd>
       </button>
 
