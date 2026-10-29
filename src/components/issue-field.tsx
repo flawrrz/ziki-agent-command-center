@@ -4,23 +4,26 @@ import Link from "next/link";
 import { useState } from "react";
 import type { CellState, Field, FieldCell } from "@/lib/board";
 
-const BANDS: { state: CellState; label: string; cap: number }[] = [
-  { state: "need", label: "Needs you", cap: 60 },
-  { state: "late", label: "Past due", cap: 60 },
-  { state: "running", label: "Working", cap: 140 },
-  { state: "delivered", label: "Delivered", cap: 140 },
-  { state: "released", label: "Released", cap: 140 },
-  { state: "idle", label: "No agent", cap: 120 },
+const BANDS: { states: CellState[]; label: string; cap: number }[] = [
+  { states: ["need"], label: "Needs you", cap: 60 },
+  { states: ["late"], label: "Past due", cap: 60 },
+  { states: ["running"], label: "Working", cap: 140 },
+  { states: ["delivered"], label: "Delivered", cap: 140 },
+  /* One band, two shapes: a claim that came back and one nobody ever took are
+     the same live state — waiting for dispatch — so they share a row. The cell's
+     own tooltip says which, and the square is filled or only outlined, so the
+     split stays visible without costing a second band. */
+  { states: ["released", "idle"], label: "Unclaimed", cap: 260 },
 ];
 
 function Band({
   label,
-  state,
+  states,
   cells,
   total,
 }: {
   label: string;
-  state: CellState;
+  states: CellState[];
   cells: FieldCell[];
   total: number;
 }) {
@@ -30,7 +33,7 @@ function Band({
         {label}
         <span className="zk-num ml-2 font-normal text-zk-text2">{total}</span>
       </span>
-      <div className="zk-field min-w-0 flex-1" data-band={state}>
+      <div className="zk-field min-w-0 flex-1" data-band={states.join(" ")}>
         {cells.map((cell) => (
           <Link
             key={cell.href}
@@ -57,13 +60,13 @@ export function IssueField({ field }: { field: Field }) {
   return (
     <div className="space-y-3">
       {BANDS.map((band) => {
-        const all = field.cells.filter((cell) => cell.state === band.state);
+        const all = field.cells.filter((cell) => band.states.includes(cell.state));
 
         return all.length === 0 ? null : (
           <Band
-            key={band.state}
+            key={band.label}
             label={band.label}
-            state={band.state}
+            states={band.states}
             total={all.length}
             cells={expanded ? all : all.slice(0, band.cap)}
           />

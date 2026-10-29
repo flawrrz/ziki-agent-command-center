@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { ArrowLeft, ExternalLink } from "lucide-react";
 import { useDemo } from "@/lib/demo-store";
-import { CELL_TEXT } from "@/lib/board";
+import { CELL_TEXT, corpusIssue } from "@/lib/board";
 import { formatDateTime, formatRelative } from "@/lib/format";
 import type { Issue } from "@/lib/types";
 import { cn } from "@/lib/cn";
@@ -109,31 +109,93 @@ export function IssueDetail({ number }: { number: number }) {
   );
 
   const issue =
-    needs[0]?.issue ?? claim?.issue ?? outcomes[0]?.issue ?? updates[0]?.issue;
+    needs[0]?.issue ??
+    claim?.issue ??
+    outcomes[0]?.issue ??
+    updates[0]?.issue ??
+    null;
+
+  /* Every field square links here, including the ones no agent ever touched, so
+     the corpus answers for them even when the store has no record. */
+  const record = issue ?? corpusIssue(number);
+
+  const index = field?.cells.findIndex((cell) => cell.issue.number === number) ?? -1;
+  const previous = index > 0 ? field?.cells[index - 1] : null;
+  const next =
+    field && index >= 0 && index < field.cells.length - 1
+      ? field.cells[index + 1]
+      : null;
+
+  const neighbours = (
+    <nav
+      className="flex items-stretch justify-between gap-3 border-t border-zk-divider pt-3"
+      aria-label="Neighbouring issues"
+    >
+      {previous ? (
+        <Link
+          href={previous.href}
+          prefetch={false}
+          className="min-w-0 max-w-[48%] text-[12px] text-zk-muted transition hover:text-zk-text"
+        >
+          <span className="zk-num block text-[10px] uppercase tracking-[0.14em]">
+            ← #{previous.issue.number} · {CELL_TEXT[previous.state]}
+          </span>
+          <span className="line-clamp-1">{previous.issue.title}</span>
+        </Link>
+      ) : (
+        <Link
+          href="/"
+          className="text-[12px] font-semibold text-zk-accent hover:underline"
+        >
+          ← Back to dashboard
+        </Link>
+      )}
+
+      {next ? (
+        <Link
+          href={next.href}
+          prefetch={false}
+          className="min-w-0 max-w-[48%] text-right text-[12px] text-zk-muted transition hover:text-zk-text"
+        >
+          <span className="zk-num block text-[10px] uppercase tracking-[0.14em]">
+            #{next.issue.number} · {CELL_TEXT[next.state]} →
+          </span>
+          <span className="line-clamp-1">{next.issue.title}</span>
+        </Link>
+      ) : null}
+    </nav>
+  );
+
+  if (!record) {
+    return (
+      <EmptyState
+        title={`No issue #${number} in this prototype`}
+        description="Every square on the board links to a page like this one. That number is not one of them."
+        action={
+          <Link href="/" className="zk-btn zk-btn-secondary zk-btn-sm">
+            Back to Today
+          </Link>
+        }
+      />
+    );
+  }
 
   if (!issue) {
     return (
-      <div className="space-y-4">
-        <IssueHeader
-          issue={{
-            number,
-            title: "This issue has no recorded agent activity",
-            priority: "Low",
-            project: "Zedu",
-            url: "https://ziki.dev/dashboard",
-          }}
-          statusLabel="Unknown"
-          statusTone="neutral"
-        />
-        <EmptyState
-          title="Nothing tracked for this issue"
-          description="The prototype only stores issues your agents have claimed, been offered or resolved."
-          action={
-            <Link href="/" className="zk-btn zk-btn-secondary zk-btn-sm">
-              Back to Today
-            </Link>
-          }
-        />
+      <div className="mx-auto max-w-[56rem] space-y-6">
+        <IssueHeader issue={record} statusLabel="Unclaimed" statusTone="neutral" />
+
+        <p className="zk-inset rounded-card px-4 py-3 text-[12.5px] leading-relaxed text-zk-muted">
+          Dispatch has never ranked this issue, so there is no offer, claim or
+          event to show. That is the same fact the field draws as an outlined
+          square:{" "}
+          <span className="zk-num font-bold text-zk-text2">{field?.counts.idle}</span>{" "}
+          of{" "}
+          <span className="zk-num font-bold text-zk-text2">{field?.total}</span>{" "}
+          issues are waiting for a first offer.
+        </p>
+
+        {neighbours}
       </div>
     );
   }
@@ -201,13 +263,6 @@ export function IssueDetail({ number }: { number: number }) {
           : "No active work";
 
   const statusTone = needs.length > 0 ? "warn" : claim ? "info" : outcomes.length > 0 ? "ok" : "neutral";
-
-  const index = field?.cells.findIndex((cell) => cell.issue.number === number) ?? -1;
-  const previous = index > 0 ? field?.cells[index - 1] : null;
-  const next =
-    field && index >= 0 && index < field.cells.length - 1
-      ? field.cells[index + 1]
-      : null;
 
   return (
     <div className="mx-auto max-w-[56rem] space-y-6">
@@ -293,43 +348,7 @@ export function IssueDetail({ number }: { number: number }) {
         )}
       </section>
 
-      <nav
-        className="flex items-stretch justify-between gap-3 border-t border-zk-divider pt-3"
-        aria-label="Neighbouring issues"
-      >
-        {previous ? (
-          <Link
-            href={previous.href}
-            prefetch={false}
-            className="min-w-0 max-w-[48%] text-[12px] text-zk-muted transition hover:text-zk-text"
-          >
-            <span className="zk-num block text-[10px] uppercase tracking-[0.14em]">
-              ← #{previous.issue.number} · {CELL_TEXT[previous.state]}
-            </span>
-            <span className="line-clamp-1">{previous.issue.title}</span>
-          </Link>
-        ) : (
-          <Link
-            href="/"
-            className="text-[12px] font-semibold text-zk-accent hover:underline"
-          >
-            ← Back to dashboard
-          </Link>
-        )}
-
-        {next ? (
-          <Link
-            href={next.href}
-            prefetch={false}
-            className="min-w-0 max-w-[48%] text-right text-[12px] text-zk-muted transition hover:text-zk-text"
-          >
-            <span className="zk-num block text-[10px] uppercase tracking-[0.14em]">
-              #{next.issue.number} · {CELL_TEXT[next.state]} →
-            </span>
-            <span className="line-clamp-1">{next.issue.title}</span>
-          </Link>
-        ) : null}
-      </nav>
+      {neighbours}
     </div>
   );
 }

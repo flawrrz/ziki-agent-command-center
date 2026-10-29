@@ -15,7 +15,7 @@ const FILTERS: { id: CellState | "all"; label: string }[] = [
   { id: "running", label: "Running" },
   { id: "delivered", label: "Delivered" },
   { id: "released", label: "Released" },
-  { id: "idle", label: "No agent" },
+  { id: "idle", label: "Unclaimed" },
 ];
 
 const PAGE = 40;

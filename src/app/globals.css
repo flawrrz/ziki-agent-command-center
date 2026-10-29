@@ -528,11 +528,13 @@
     align-items: center;
     justify-content: center;
     height: 12px;
-    border: 1px solid transparent;
+    /* Every cell is drawn, reached or not: the unread ones are the distance left
+       to travel, so a borderless ghost digit cannot be read as "no rail". */
+    border: 1px solid var(--zk-border);
     border-radius: 2px;
     font-size: 8px;
     line-height: 1;
-    color: color-mix(in srgb, var(--zk-muted) 60%, transparent);
+    color: var(--zk-muted);
   }
 
   .zk-rail-seg[data-state="done"] {
@@ -622,12 +624,20 @@
     background-color: color-mix(in srgb, var(--zk-ok-fg) 45%, transparent);
   }
 
+  /* Inside the merged unclaimed band the two endings are told apart by
+     whether the square is filled in at all: a returned claim is solid, an
+     issue nobody ever took is only outlined. Both use the same tone, so the
+     difference is amount of ink rather than hue, and the outline survives a
+     9px cell in either theme. A shape that carries the split retires the text
+     hint the ledger used to spend on it. */
   .zk-cell[data-state="released"] {
-    background-color: var(--zk-dot);
+    background-color: color-mix(in srgb, var(--zk-muted) 45%, transparent);
   }
 
   .zk-cell[data-state="idle"] {
-    background-color: color-mix(in srgb, var(--zk-text) 7%, transparent);
+    background-color: transparent;
+    box-shadow: inset 0 0 0 1px
+      color-mix(in srgb, var(--zk-muted) 70%, transparent);
   }
 }
 

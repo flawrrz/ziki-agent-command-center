@@ -22,7 +22,7 @@ A list is only a good list while it is short. At 991 issues the honest options a
 
 ### 1. Ledger
 
-Seven hairline cells across the top — `NEEDS YOU 40 · PAST DUE 11 · RUNNING 98 · DELIVERED 296 · RELEASED 173 · NO AGENT 373 · ALL ISSUES 991` — each a link to the section that holds those rows. Every cell counts **issues**, never requests or claims, so the six state cells always sum to the seventh; `NEEDS YOU` is the number of issues waiting on a human, not the number of asks on them. The last cell is a denominator, not a state, which is why it reads **All issues** rather than *backlog* — "backlog" would collide with `NO AGENT` and claim delivered work as unfinished. The counts cover the whole corpus, not the slice on screen, and they come from the same one-per-issue selector that draws the field, so a number and its cells can never disagree.
+Six hairline cells across the top — `NEEDS YOU 40 · PAST DUE 20 · RUNNING 89 · DELIVERED 296 · UNCLAIMED 546 · ALL ISSUES 991` — each a link to the section that holds those rows. Every cell counts **issues**, never requests or claims, so the five state cells always sum to the sixth; `NEEDS YOU` is the number of issues waiting on a human, not the number of asks on them. **Unclaimed** folds two endings into one live state: an issue dispatch never offered to an agent, and one whose claim was released at its deadline. Both wait for the same thing, so they share a cell, and the field keeps the split as a shape instead of a sentence — a returned claim is a solid square, an issue nobody ever took is only outlined. "Nobody ranked anyone" and "an agent lost it" stay separable without a second band in the field. The last cell is a denominator, not a state, which is why it reads **All issues** rather than *backlog* — "backlog" would collide with `UNCLAIMED` and claim delivered work as unfinished. The counts cover the whole corpus, not the slice on screen, and they come from the same one-per-issue selector that draws the field, so a number and its cells can never disagree.
 
 ### 2. Bounded queues
 
@@ -36,7 +36,7 @@ The rail is derived only from events the agent actually reported (`Draft pushed`
 
 ### 4. The field
 
-One square per issue, banded by state, so ~1000 rows cost about 300px of height instead of 40,000. Bands are capped (60/60/140/140/140/120) and "Show every issue" lifts the caps. Every square is a link; its `title` carries `#1425 agent working · Sira · <issue title>`. History fades to grey; only the states you can act on are drawn at full strength.
+One square per issue, banded by state, so ~1000 rows cost about 300px of height instead of 40,000. Bands are capped (60/60/140/140/260) and "Show every issue" lifts the caps. Every square is a link; its `title` carries `#1425 agent working · Sira · <issue title>`. History fades to grey; only the states you can act on are drawn at full strength. The last band is **Unclaimed** and holds both endings in one row: a returned claim is filled, an issue nobody ever took is drawn as an outline. Outlining instead of filling at 7% opacity is what makes 373 empty squares visible on both themes while leaving the ledger with one unclaimed number.
 
 ### 5. Search
 
@@ -82,6 +82,8 @@ The simulated rules mirror the live product: offers expire after 30 minutes, hea
 | `/issue/[number]` | One issue: decision card, claim with checkpoint readout, event chain, neighbours |
 
 The eleven hand-written issues prerender; the generated tail renders on demand. Prev/next links in the drill-down walk the field in the same order the grid draws it, so you can read the backlog without returning to the board.
+
+The store only keeps issues a claim, need, outcome or update mentions, so ~370 squares would otherwise open a dead end. They do not: the drill-down falls back to the generated corpus for the title and priority and says the one true thing about such an issue — dispatch has never ranked it, and here is how many others are in that queue. A number outside the corpus gets a plain not-found rather than an invented record.
 
 ## Stack
 
@@ -138,7 +140,7 @@ src/
     layout.tsx               theme pre-paint, shell, providers
   components/
     today-board.tsx          masthead, ledger, bounded sections
-    ledger.tsx               seven whole-corpus counts, each a jump link
+    ledger.tsx               six whole-corpus counts, each a jump link
     focus-card.tsx           the one decision, at reading size, with its verbs
     queue-row.tsx            one line: marker, number, agent, words, rail, clock
     checkpoint-rail.tsx      numbered rail and its drill-down readout
