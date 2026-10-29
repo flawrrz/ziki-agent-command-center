@@ -83,6 +83,8 @@ The simulated rules mirror the live product: offers expire after 30 minutes, hea
 
 The eleven hand-written issues prerender; the generated tail renders on demand. Prev/next links in the drill-down walk the field in the same order the grid draws it, so you can read the backlog without returning to the board.
 
+The store only keeps issues a claim, need, outcome or update mentions, so ~370 squares would otherwise open a dead end. They do not: the drill-down falls back to the generated corpus for the title and priority and says the one true thing about such an issue — dispatch has never ranked it, and here is how many others are in that queue. A number outside the corpus gets a plain not-found rather than an invented record.
+
 ## Stack
 
 - Next.js 16 (App Router, static prerendering)

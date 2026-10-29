@@ -324,3 +324,18 @@ export const CELL_TEXT: Record<CellState, string> = {
   released: "claim released",
   idle: "unclaimed",
 };
+
+/* The store keeps only issues that a claim, need, outcome or update mentions,
+   so ~370 of the field's squares have no record to carry a title. Every square
+   is a link, so the corpus has to answer for them: this is the same list
+   `buildField` walks, indexed once. */
+const CORPUS = new Map<number, Issue>(
+  [...Object.values(ISSUES), ...BACKLOG_ISSUES].map((issue) => [
+    issue.number,
+    issue,
+  ]),
+);
+
+export function corpusIssue(number: number): Issue | null {
+  return CORPUS.get(number) ?? null;
+}
