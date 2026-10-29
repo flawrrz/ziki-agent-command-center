@@ -34,8 +34,17 @@ export function Ledger({
     { label: "Past due", value: field.counts.late, href: "#running", tone: "text-zk-bad-fg" },
     { label: "Running", value: field.counts.running, href: "#running", tone: "text-zk-info-fg" },
     { label: "Delivered", value: field.counts.delivered, href: "#shipped", tone: "text-zk-ok-fg" },
-    { label: "Released", value: field.counts.released, href: "#shipped", tone: "text-zk-text2" },
-    { label: "No agent", value: field.counts.idle, href: "#field", tone: "text-zk-muted" },
+    /* Released is folded in rather than given its own cell: the live state of a
+       returned issue is the same as one nobody ever took. The hint keeps the
+       split, because "dispatch never ranked anyone" and "an agent lost it" are
+       different questions to ask. */
+    {
+      label: "Unclaimed",
+      value: field.counts.idle + field.counts.released,
+      href: "#field",
+      tone: "text-zk-muted",
+      hint: `${field.counts.idle} untouched · ${field.counts.released} released`,
+    },
   ];
 
   return (

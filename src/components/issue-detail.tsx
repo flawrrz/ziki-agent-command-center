@@ -122,7 +122,7 @@ export function IssueDetail({ number }: { number: number }) {
             project: "Zedu",
             url: "https://ziki.dev/dashboard",
           }}
-          statusLabel="Unknown"
+          statusLabel="Unclaimed"
           statusTone="neutral"
         />
         <EmptyState

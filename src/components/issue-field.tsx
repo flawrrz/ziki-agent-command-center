@@ -10,7 +10,7 @@ const BANDS: { state: CellState; label: string; cap: number }[] = [
   { state: "running", label: "Working", cap: 140 },
   { state: "delivered", label: "Delivered", cap: 140 },
   { state: "released", label: "Released", cap: 140 },
-  { state: "idle", label: "No agent", cap: 120 },
+  { state: "idle", label: "Unclaimed", cap: 120 },
 ];
 
 function Band({

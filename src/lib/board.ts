@@ -322,5 +322,5 @@ export const CELL_TEXT: Record<CellState, string> = {
   running: "agent working",
   delivered: "delivered",
   released: "claim released",
-  idle: "no agent",
+  idle: "unclaimed",
 };
