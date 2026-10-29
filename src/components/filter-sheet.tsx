@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import { Search } from "lucide-react";
 import { useDemo } from "@/lib/demo-store";
@@ -37,6 +37,7 @@ function matches(cell: FieldCell, query: string): boolean {
  */
 export function FilterSheet() {
   const router = useRouter();
+  const pathname = usePathname();
   const { field } = useDemo();
   const dialogRef = useRef<HTMLDialogElement>(null);
   const [query, setQuery] = useState("");
@@ -65,6 +66,14 @@ export function FilterSheet() {
     setLimit(PAGE);
     setActive(0);
   }, [query, filter]);
+
+  /* Rows are real links, so cmd-click and middle-click work — but a plain click
+     navigates without ever reaching close(). The sheet lives in the layout, so it
+     would stay modal on top of the page it just opened. Any route change takes it
+     down with it. */
+  useEffect(() => {
+    dialogRef.current?.close();
+  }, [pathname]);
 
   useEffect(() => {
     function onKeyDown(event: KeyboardEvent) {
@@ -96,6 +105,24 @@ export function FilterSheet() {
     router.push(href);
   }
 
+  /* A modal <dialog> does not dismiss on backdrop clicks, and the ::backdrop
+     swallows them, so nothing happened outside the card. Judging the pointer
+     against the dialog's own rect rather than event.target keeps the card's
+     1.25rem padding inside the sheet, and reacting on press rather than click
+     means a drag that starts on a result and ends outside does not close. */
+  function dismissOnOutsidePress(event: React.PointerEvent<HTMLDialogElement>) {
+    const dialog = dialogRef.current;
+    if (!dialog) return;
+    const rect = dialog.getBoundingClientRect();
+    const inside =
+      event.clientX >= rect.left &&
+      event.clientX <= rect.right &&
+      event.clientY >= rect.top &&
+      event.clientY <= rect.bottom;
+
+    if (!inside) dialog.close();
+  }
+
   return (
     <>
       <button
@@ -119,7 +146,11 @@ export function FilterSheet() {
         <Search className="h-4 w-4" aria-hidden="true" />
       </button>
 
-      <dialog ref={dialogRef} className="zk-dialog !w-[min(40rem,calc(100vw-2rem))]">
+      <dialog
+        ref={dialogRef}
+        onPointerDown={dismissOnOutsidePress}
+        className="zk-dialog !w-[min(40rem,calc(100vw-2rem))]"
+      >
         <div>
           <input
             autoFocus
