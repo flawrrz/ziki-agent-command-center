@@ -22,7 +22,7 @@ A list is only a good list while it is short. At 991 issues the honest options a
 
 ### 1. Ledger
 
-Six hairline cells across the top — `NEEDS YOU 40 · PAST DUE 20 · RUNNING 89 · DELIVERED 296 · UNCLAIMED 546 · ALL ISSUES 991` — each a link to the section that holds those rows. Every cell counts **issues**, never requests or claims, so the five state cells always sum to the sixth; `NEEDS YOU` is the number of issues waiting on a human, not the number of asks on them. **Unclaimed** folds two endings into one live state: an issue dispatch never offered to an agent, and one whose claim was released at its deadline. Both wait for the same thing, so they share a cell — but the hint keeps the split (`373 untouched · 173 released`), because "nobody ranked anyone" and "an agent lost it" are different questions to ask, and the field still draws them as two bands. The last cell is a denominator, not a state, which is why it reads **All issues** rather than *backlog* — "backlog" would collide with `UNCLAIMED` and claim delivered work as unfinished. The counts cover the whole corpus, not the slice on screen, and they come from the same one-per-issue selector that draws the field, so a number and its cells can never disagree.
+Six hairline cells across the top — `NEEDS YOU 40 · PAST DUE 20 · RUNNING 89 · DELIVERED 296 · UNCLAIMED 546 · ALL ISSUES 991` — each a link to the section that holds those rows. Every cell counts **issues**, never requests or claims, so the five state cells always sum to the sixth; `NEEDS YOU` is the number of issues waiting on a human, not the number of asks on them. **Unclaimed** folds two endings into one live state: an issue dispatch never offered to an agent, and one whose claim was released at its deadline. Both wait for the same thing, so they share a cell, and the field keeps the split as a shape instead of a sentence — a returned claim is a solid square, an issue nobody ever took is only outlined. "Nobody ranked anyone" and "an agent lost it" stay separable without a second band in the field. The last cell is a denominator, not a state, which is why it reads **All issues** rather than *backlog* — "backlog" would collide with `UNCLAIMED` and claim delivered work as unfinished. The counts cover the whole corpus, not the slice on screen, and they come from the same one-per-issue selector that draws the field, so a number and its cells can never disagree.
 
 ### 2. Bounded queues
 
@@ -36,7 +36,7 @@ The rail is derived only from events the agent actually reported (`Draft pushed`
 
 ### 4. The field
 
-One square per issue, banded by state, so ~1000 rows cost about 300px of height instead of 40,000. Bands are capped (60/60/140/140/140/120) and "Show every issue" lifts the caps. Every square is a link; its `title` carries `#1425 agent working · Sira · <issue title>`. History fades to grey; only the states you can act on are drawn at full strength.
+One square per issue, banded by state, so ~1000 rows cost about 300px of height instead of 40,000. Bands are capped (60/60/140/140/260) and "Show every issue" lifts the caps. Every square is a link; its `title` carries `#1425 agent working · Sira · <issue title>`. History fades to grey; only the states you can act on are drawn at full strength. The last band is **Unclaimed** and holds both endings in one row: a returned claim is filled, an issue nobody ever took is drawn as an outline. Outlining instead of filling at 7% opacity is what makes 373 empty squares visible on both themes while leaving the ledger with one unclaimed number.
 
 ### 5. Search
 

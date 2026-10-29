@@ -35,15 +35,14 @@ export function Ledger({
     { label: "Running", value: field.counts.running, href: "#running", tone: "text-zk-info-fg" },
     { label: "Delivered", value: field.counts.delivered, href: "#shipped", tone: "text-zk-ok-fg" },
     /* Released is folded in rather than given its own cell: the live state of a
-       returned issue is the same as one nobody ever took. The hint keeps the
-       split, because "dispatch never ranked anyone" and "an agent lost it" are
-       different questions to ask. */
+       returned issue is the same as one nobody ever took. The field keeps the
+       split visible — solid square for a claim that came back, outline for one
+       that was never made. */
     {
       label: "Unclaimed",
       value: field.counts.idle + field.counts.released,
       href: "#field",
       tone: "text-zk-muted",
-      hint: `${field.counts.idle} untouched · ${field.counts.released} released`,
     },
   ];
 
@@ -61,8 +60,8 @@ export function Ledger({
         </Link>
       ))}
 
-      {/* Not a state: the denominator the six cells above add up to. "Backlog"
-          would collide with NO AGENT and claim delivered work as unfinished. */}
+      {/* Not a state: the denominator the five cells above add up to. "Backlog"
+          would collide with UNCLAIMED and claim delivered work as unfinished. */}
       <div className="zk-ledger-cell justify-between">
         <span className="zk-label">All issues</span>
         <span className="zk-num text-[22px] font-bold leading-none text-zk-text2">

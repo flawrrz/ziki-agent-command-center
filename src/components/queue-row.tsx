@@ -113,9 +113,12 @@ export function QueueRow({
           </>
         ) : null}
 
+        {/* A minimum, not a fixed width: the clock and the verb are the last two
+            columns, so a font that measures wider than the box has to push the
+            verb aside instead of painting through it. */}
         <span
           className={cn(
-            "zk-num shrink-0 whitespace-nowrap text-right text-[11px] sm:w-[62px]",
+            "zk-num shrink-0 whitespace-nowrap text-right text-[11px] sm:min-w-[62px]",
             late ? "font-bold text-zk-bad-fg" : "text-zk-muted",
           )}
         >
@@ -123,7 +126,7 @@ export function QueueRow({
         </span>
 
         {card.verb ? (
-          <span className="hidden w-[62px] shrink-0 text-right text-[10px] font-bold uppercase tracking-[0.08em] text-zk-accent sm:block">
+          <span className="hidden shrink-0 whitespace-nowrap text-right text-[10px] font-bold uppercase tracking-[0.08em] text-zk-accent sm:block sm:min-w-[62px]">
             {card.verb}
           </span>
         ) : null}
