@@ -107,7 +107,6 @@ export type Claim = {
   nextStep: string;
   nextStepTone: "neutral" | "info" | "warn" | "bad" | "ok";
   releaseReason?: string;
-  cycles?: number;
   events: ClaimEvent[];
 };
 

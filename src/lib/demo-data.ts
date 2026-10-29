@@ -7,8 +7,9 @@ import type {
   Outcome,
   WorkspaceUpdate,
 } from "./types";
+import { buildBacklog } from "./backlog";
 
-export const DEMO_STATE_VERSION = 3;
+export const DEMO_STATE_VERSION = 13;
 export const DEMO_STORAGE_KEY = "ziki-agent-command-center:v1";
 
 const MINUTE = 60_000;
@@ -203,7 +204,7 @@ function seedClaims(now: number): Claim[] {
       agentId: "personal-agent",
       issue: ISSUES.presenceStale,
       status: "active",
-      latestLabel: "Reproducing the stale presence window",
+      latestLabel: "Writing the patch",
       updatedAt: now - 14 * MINUTE,
       deadline: now + 96 * MINUTE,
       lastHeartbeat: now - 4 * MINUTE,
@@ -267,7 +268,6 @@ function seedClaims(now: number): Claim[] {
       lastHeartbeat: now - 2 * MINUTE,
       nextStep: "Answer Fixit's question to resume the claim",
       nextStepTone: "warn",
-      cycles: 3,
       events: [
         {
           at: now - 6 * DAY,
@@ -644,14 +644,16 @@ function seedUpdates(now: number): WorkspaceUpdate[] {
 }
 
 export function seedDemoState(now = Date.now()): DemoState {
+  const backlog = buildBacklog(now);
+
   return {
     version: DEMO_STATE_VERSION,
     seededAt: now,
-    agents: seedAgents(now),
-    needs: seedNeeds(now),
-    claims: seedClaims(now),
-    outcomes: seedOutcomes(now),
-    updates: seedUpdates(now),
+    agents: [...seedAgents(now), ...backlog.agents],
+    needs: [...backlog.needs, ...seedNeeds(now)],
+    claims: [...seedClaims(now), ...backlog.claims],
+    outcomes: [...seedOutcomes(now), ...backlog.outcomes],
+    updates: [...seedUpdates(now), ...backlog.updates],
     readNotificationIds: [],
   };
 }

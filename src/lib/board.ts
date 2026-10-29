@@ -1,4 +1,6 @@
-import { sortOpenNeeds } from "./demo-selectors";
+import { liveNeeds } from "./demo-selectors";
+import { BACKLOG_ISSUES } from "./backlog";
+import { ISSUES } from "./demo-data";
 import type {
   Agent,
   Claim,
@@ -143,7 +145,7 @@ function runningCard(
   };
 }
 
-function shippedCard(outcome: Outcome, agents: Agent[]): BoardCard {
+function shippedCard(outcome: Outcome, agents: Agent[], claim?: Claim): BoardCard {
   const agent = agents.find((candidate) => candidate.id === outcome.agentId);
 
   return {
@@ -152,6 +154,9 @@ function shippedCard(outcome: Outcome, agents: Agent[]): BoardCard {
     issue: outcome.issue,
     agent,
     outcome,
+    /* The rail on a shipped row is the claim that produced the outcome, so the
+       row can show the whole awarded → merged path rather than a tick. */
+    claim,
     tag: shortLabel(outcome.label),
     overdue: false,
     at: outcome.at,
@@ -166,22 +171,31 @@ export type Board = {
   waitingIssues: Set<number>;
 };
 
-export function buildBoard(state: DemoState, now: number): Board {
-  const open = sortOpenNeeds(state.needs);
-  const waiting = [
-    ...open.map((need) => waitingCard(need, state.agents, state.claims, now)),
-    ...state.needs
-      .filter((need) => need.status === "expired")
-      .map((need) => waitingCard(need, state.agents, state.claims, now)),
-  ];
+/* The field and the rails must agree, so both read the claim that won an issue. */
+function latestClaimByIssue(state: DemoState): Map<number, Claim> {
+  const claimByIssue = new Map<number, Claim>();
 
-  const waitingIssues = new Set(
-    [...open, ...state.needs.filter((need) => need.status === "expired")].map(
-      (need) => need.issue.number,
-    ),
+  for (const claim of state.claims) {
+    const existing = claimByIssue.get(claim.issue.number);
+    if (!existing || claim.updatedAt > existing.updatedAt) {
+      claimByIssue.set(claim.issue.number, claim);
+    }
+  }
+
+  return claimByIssue;
+}
+
+export function buildBoard(state: DemoState, now: number): Board {
+  const live = liveNeeds(state);
+  const waiting = live.map((need) =>
+    waitingCard(need, state.agents, state.claims, now),
   );
 
-  const running = state.claims
+  const waitingIssues = new Set(live.map((need) => need.issue.number));
+
+  const latest = latestClaimByIssue(state);
+
+  const running = [...latest.values()]
     .filter(
       (claim) =>
         WORK_STATUSES.includes(claim.status) && !waitingIssues.has(claim.issue.number),
@@ -194,9 +208,119 @@ export function buildBoard(state: DemoState, now: number): Board {
     })
     .map((claim) => runningCard(claim, state.agents, now));
 
-  const shipped = [...state.outcomes]
+  /* Delivered means the winning claim completed and nothing is waiting: the
+     ledger's DELIVERED cell and this rail are then the same set by construction. */
+  const shipped = state.outcomes
+    .filter(
+      (outcome) =>
+        latest.get(outcome.issue.number)?.status === "completed" &&
+        !waitingIssues.has(outcome.issue.number),
+    )
     .sort((a, b) => b.at - a.at)
-    .map((outcome) => shippedCard(outcome, state.agents));
+    .map((outcome) => shippedCard(outcome, state.agents, latest.get(outcome.issue.number)));
 
   return { waiting, running, shipped, waitingIssues };
 }
+
+export type CellState =
+  | "need"
+  | "late"
+  | "running"
+  | "delivered"
+  | "released"
+  | "idle";
+
+export type FieldCell = {
+  issue: Issue;
+  state: CellState;
+  label: string;
+  href: string;
+};
+
+export type Field = {
+  cells: FieldCell[];
+  counts: Record<CellState, number>;
+  total: number;
+};
+
+const CELL_ORDER: CellState[] = [
+  "need",
+  "late",
+  "running",
+  "delivered",
+  "released",
+  "idle",
+];
+
+/**
+ * The backlog has ~1000 rows and only ~60 of them are live, so the whole set is
+ * shown as one cell each instead of a list. Ordering puts the states you can act
+ * on first, so a truncated grid never hides a decision behind history.
+ */
+export function buildField(state: DemoState): Field {
+  /* The same one-per-issue pick the queue uses, so a cell never describes a
+     different need than the row for that issue. */
+  const byIssue = new Map(
+    liveNeeds(state).map((need) => [need.issue.number, need]),
+  );
+
+  const claimByIssue = latestClaimByIssue(state);
+
+  const counts: Record<CellState, number> = {
+    need: 0,
+    late: 0,
+    running: 0,
+    delivered: 0,
+    released: 0,
+    idle: 0,
+  };
+
+  const issues = [...Object.values(ISSUES), ...BACKLOG_ISSUES];
+  const agentNames = new Map(state.agents.map((agent) => [agent.id, agent.name]));
+
+  const cells = issues.map((issue) => {
+    const need = byIssue.get(issue.number);
+    const claim = claimByIssue.get(issue.number);
+
+    let cellState: CellState = "idle";
+
+    if (need) cellState = "need";
+    else if (claim?.status === "overdue") cellState = "late";
+    else if (claim && WORK_STATUSES.includes(claim.status)) cellState = "running";
+    else if (claim?.status === "completed") cellState = "delivered";
+    else if (claim?.status === "released" || claim?.status === "expired") {
+      cellState = "released";
+    }
+
+    counts[cellState] += 1;
+
+    const who = agentNames.get(claim?.agentId ?? need?.agentId ?? "");
+
+    return {
+      issue,
+      state: cellState,
+      href: issueHref(issue.number),
+      label: `#${issue.number} ${CELL_TEXT[cellState]}${who ? ` · ${who}` : ""} · ${issue.title}`,
+    };
+  });
+
+  const rank = (cell: FieldCell) => CELL_ORDER.indexOf(cell.state);
+
+  cells.sort((a, b) => {
+    const byState = rank(a) - rank(b);
+    if (byState !== 0) return byState;
+
+    return b.issue.number - a.issue.number;
+  });
+
+  return { cells, counts, total: cells.length };
+}
+
+export const CELL_TEXT: Record<CellState, string> = {
+  need: "needs you",
+  late: "past due",
+  running: "agent working",
+  delivered: "delivered",
+  released: "claim released",
+  idle: "no agent",
+};

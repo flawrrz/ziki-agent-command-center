@@ -111,6 +111,8 @@ export function presenceMeta(agent: Agent): PresenceMeta {
 }
 
 export function buildFeed(state: DemoState): FeedItem[] {
+  const read = new Set(state.readNotificationIds);
+
   const needItems: FeedItem[] = state.needs
     .filter((need) => need.status !== "resolved")
     .map((need) => {
@@ -128,23 +130,26 @@ export function buildFeed(state: DemoState): FeedItem[] {
         needsYou: true,
         expiresAt: need.expiresAt,
         href: `/issue/${need.issue.number}#${need.id}`,
-        unread: !state.readNotificationIds.includes(`feed-${need.id}`),
+        unread: !read.has(`feed-${need.id}`),
       };
     });
 
-  const updateItems: FeedItem[] = state.updates.map((update) => ({
-    id: `feed-${update.id}`,
-    issue: update.issue,
-    actorName: update.actorName,
-    actorRole: update.actorRole,
-    ownerName: update.ownerName,
-    title: update.title,
-    detail: update.detail,
-    at: update.at,
-    needsYou: false,
-    href: `/issue/${update.issue.number}`,
-    unread: !state.readNotificationIds.includes(`feed-${update.id}`),
-  }));
+  const updateItems: FeedItem[] = [...state.updates]
+    .sort((a, b) => b.at - a.at)
+    .slice(0, 40)
+    .map((update) => ({
+      id: `feed-${update.id}`,
+      issue: update.issue,
+      actorName: update.actorName,
+      actorRole: update.actorRole,
+      ownerName: update.ownerName,
+      title: update.title,
+      detail: update.detail,
+      at: update.at,
+      needsYou: false,
+      href: `/issue/${update.issue.number}`,
+      unread: !read.has(`feed-${update.id}`),
+    }));
 
   return [...needItems, ...updateItems].sort((a, b) => b.at - a.at);
 }
@@ -193,6 +198,22 @@ export function expiredNeeds(state: DemoState): NeedItem[] {
   return state.needs
     .filter((need) => need.status === "expired")
     .sort((a, b) => b.createdAt - a.createdAt);
+}
+
+/**
+ * Live requests, at most one per issue. An issue can hold both an open ask and
+ * an expired offer, but the queue, the ledger and the field all describe issues,
+ * so counting requests here would break the "an issue appears once" rule and stop
+ * the ledger from summing to the total.
+ */
+export function liveNeeds(state: DemoState): NeedItem[] {
+  const byIssue = new Map<number, NeedItem>();
+
+  for (const need of [...unresolvedNeeds(state), ...expiredNeeds(state)]) {
+    if (!byIssue.has(need.issue.number)) byIssue.set(need.issue.number, need);
+  }
+
+  return [...byIssue.values()];
 }
 
 export function resolvedNeeds(state: DemoState): NeedItem[] {
