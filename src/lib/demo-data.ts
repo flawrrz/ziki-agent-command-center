@@ -9,7 +9,7 @@ import type {
 } from "./types";
 import { buildBacklog } from "./backlog";
 
-export const DEMO_STATE_VERSION = 12;
+export const DEMO_STATE_VERSION = 13;
 export const DEMO_STORAGE_KEY = "ziki-agent-command-center:v1";
 
 const MINUTE = 60_000;
@@ -204,7 +204,7 @@ function seedClaims(now: number): Claim[] {
       agentId: "personal-agent",
       issue: ISSUES.presenceStale,
       status: "active",
-      latestLabel: "Reproducing the stale presence window",
+      latestLabel: "Writing the patch",
       updatedAt: now - 14 * MINUTE,
       deadline: now + 96 * MINUTE,
       lastHeartbeat: now - 4 * MINUTE,

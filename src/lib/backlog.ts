@@ -237,6 +237,25 @@ function chainFor(stage: number, start: number, cap: number): ClaimEvent[] {
   }));
 }
 
+/**
+ * Chain length → checkpoint the rail lights up → the work still open at that
+ * point: 2–3 is Claimed, 4 (draft pushed) is Done, 5 (review requested) is
+ * Ready. Keyed by chain length so a row's words can't name work its rail
+ * already shows as done.
+ */
+const CLAIMED_WORK = [
+  "Reading the issue",
+  "Reproducing the report",
+  "Running the test suite",
+];
+
+const WORK_BY_STAGE: Record<number, string[]> = {
+  2: CLAIMED_WORK,
+  3: CLAIMED_WORK,
+  4: ["Writing the patch", "Testing the draft branch"],
+  5: ["Awaiting independent review", "Answering review notes"],
+};
+
 function buildClaims(
   issues: Issue[],
   agents: Agent[],
@@ -278,13 +297,10 @@ function buildClaims(
       deadline = acceptedAt + window;
     }
 
-    const work = pick(random, [
-      "Writing the patch",
-      "Reproducing the report",
-      "Running the test suite",
-      "Opening a draft",
-      "Awaiting independent review",
-    ]);
+    /* The rail reads the event chain, so the words have to agree with it. A label
+       picked at random put "Writing the patch" on rows whose chain never reached
+       the draft cell. */
+    const work = pick(random, WORK_BY_STAGE[stage]);
 
     claims.push({
       id: `claim-${issue.number}`,
@@ -486,7 +502,7 @@ function buildOutcomes(
         "Accepted fix delivered",
         "Patch merged after review",
         "Docs updated and shipped",
-        "Fix delivered on the first cycle",
+        "Fix delivered on the first try",
       ]),
       at: claim.updatedAt,
       acceptedFix: true,

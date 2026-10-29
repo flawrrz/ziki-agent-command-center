@@ -1,17 +1,17 @@
 import type { Claim, ClaimStatus } from "./types";
 
 /**
- * The five checkpoints every claim can reach, in order. Labels are matched
- * against real event text so the rail never invents progress the agent did not
- * report; an unrecognised event simply leaves the stage where it is. `code` is
- * the three-letter form the row rail prints when there is room for it.
+ * The four checkpoints every claim passes, in order. Labels are matched against
+ * real event text so the rail never invents progress the agent did not report;
+ * an unrecognised event simply leaves the stage where it is. `code` is the
+ * three-letter form the row rail prints when there is room for it. Each cell is
+ * a thing that now exists: a holder, a patch, a cleared change, a landed fix.
  */
 export const CHECKPOINTS = [
-  { id: "awarded", label: "Awarded", code: "AWD", match: ["bid awarded"] },
-  { id: "accepted", label: "Accepted", code: "ACC", match: ["offer accepted", "accepted the offer"] },
-  { id: "draft", label: "Draft", code: "DRF", match: ["draft pushed", "patch pushed", "branch opened"] },
-  { id: "review", label: "Review", code: "REV", match: ["review requested", "review cleared", "reproduction recorded"] },
-  { id: "delivered", label: "Merged", code: "MRG", match: ["fix linked", "delivered", "merged"] },
+  { id: "claimed", label: "Claimed", code: "CLM", match: ["bid awarded", "accepted"] },
+  { id: "done", label: "Done", code: "DON", match: ["draft pushed", "patch pushed", "branch opened", "reproduction recorded", "confirmed the report"] },
+  { id: "ready", label: "Ready", code: "RDY", match: ["review requested", "review cleared", "approval requested"] },
+  { id: "merged", label: "Merged", code: "MRG", match: ["fix linked", "delivered", "merged"] },
 ] as const;
 
 export type CheckpointId = (typeof CHECKPOINTS)[number]["id"];
@@ -26,10 +26,12 @@ export type Progress = {
   complete: boolean;
 };
 
+const LAST = CHECKPOINTS.length - 1;
+
 const STATUS_STAGE: Partial<Record<ClaimStatus, number>> = {
   offered: -1,
   expired: -1,
-  completed: 4,
+  completed: LAST,
 };
 
 function reachedStage(claim: Claim): number {
@@ -45,7 +47,7 @@ function reachedStage(claim: Claim): number {
     });
   }
 
-  return Math.min(stage, 4);
+  return Math.min(stage, LAST);
 }
 
 /**
@@ -56,7 +58,7 @@ function reachedStage(claim: Claim): number {
 function isStalled(claim: Claim, stage: number, consumed: number | null): boolean {
   if (consumed === null || claim.status !== "active") return false;
 
-  return consumed > 0.66 && stage < 4;
+  return consumed > 0.66 && stage < LAST;
 }
 
 export function claimProgress(claim: Claim, now: number): Progress {
@@ -78,6 +80,6 @@ export function claimProgress(claim: Claim, now: number): Progress {
     reached: CHECKPOINTS.slice(0, stage + 1).map((checkpoint) => checkpoint.id),
     consumed,
     stalled: isStalled(claim, stage, consumed),
-    complete: claim.status === "completed" || stage >= 4,
+    complete: claim.status === "completed" || stage >= LAST,
   };
 }

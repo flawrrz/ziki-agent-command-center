@@ -92,7 +92,7 @@ export function QueueRow({
               className="hidden w-[64px] shrink-0 sm:flex"
             />
             {/* Where there is room, name the stage instead of leaving it to the
-                legend. Below sm the five cells would be unreadable, so the row
+                legend. Below sm the cells would be unreadable, so the row
                 falls back to the count. */}
             <span
               className={cn(
@@ -108,7 +108,7 @@ export function QueueRow({
                 shipped ? "text-zk-ok-fg" : "text-zk-info-fg",
               )}
             >
-              {stage < 0 ? "0/5" : `${stage + 1}/5`}
+              {stage < 0 ? `0/${CHECKPOINTS.length}` : `${stage + 1}/${CHECKPOINTS.length}`}
             </span>
           </>
         ) : null}

@@ -514,7 +514,7 @@
     letter-spacing: -0.03em;
   }
 
-  /* Checkpoint rail: five numbered cells, one per reported checkpoint. */
+  /* Checkpoint rail: numbered cells, one per reported checkpoint. */
   .zk-rail {
     display: flex;
     align-items: center;

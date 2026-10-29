@@ -4,7 +4,7 @@ import Link from "next/link";
 import { ArrowLeft, ExternalLink } from "lucide-react";
 import { useDemo } from "@/lib/demo-store";
 import { CELL_TEXT } from "@/lib/board";
-import { formatCountdown, formatDateTime, formatRelative } from "@/lib/format";
+import { formatDateTime, formatRelative } from "@/lib/format";
 import type { Issue } from "@/lib/types";
 import { cn } from "@/lib/cn";
 import {
@@ -244,10 +244,9 @@ export function IssueDetail({ number }: { number: number }) {
           <p className="zk-num mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-zk-muted">
             <span>{claim.latestLabel}</span>
             {claim.deadline ? (
-              <span>
-                {formatDateTime(claim.deadline)} ·{" "}
-                {formatCountdown(claim.deadline, now)}
-              </span>
+              /* The readout above owns the countdown; repeating it here printed the
+                 same clock twice on one card. */
+              <span>due {formatDateTime(claim.deadline)}</span>
             ) : null}
           </p>
         </section>

@@ -1,11 +1,12 @@
-import { claimProgress, CHECKPOINTS, type Progress } from "@/lib/progress";
+import { claimProgress, CHECKPOINTS } from "@/lib/progress";
+import { formatDuration } from "@/lib/format";
 import type { Claim } from "@/lib/types";
 import { cn } from "@/lib/cn";
 
 /**
  * The rail only ever says how far the agent got. Breaches and pauses live in the
  * row's marker and clock, so one colour per job keeps the column scannable.
- * The current checkpoint is drawn apart from the reached ones so "3 of 5" can be
+ * The current checkpoint is drawn apart from the reached ones so "3 of 4" can be
  * read without counting bars.
  */
 function segmentState(claim: Claim, index: number, stage: number) {
@@ -23,9 +24,9 @@ function ariaLabel(claim: Claim, stage: number): string {
 }
 
 /**
- * Five numbered cells, one per checkpoint an agent can actually report. The
- * numbers are the point: a bar says "some amount of progress", a numbered cell
- * says which of the five the claim is standing on.
+ * Numbered cells, one per checkpoint an agent can actually report. The numbers
+ * are the point: a bar says "some amount of progress", a numbered cell says
+ * which checkpoint the claim is standing on.
  */
 export function CheckpointRail({
   claim,
@@ -85,10 +86,10 @@ export function CheckpointReadout({
         <span className="zk-label">
           {progress.stage < 0
             ? "no checkpoint yet"
-            : `checkpoint ${progress.stage + 1}/5 · ${CHECKPOINTS[progress.stage].label}`}
+            : `checkpoint ${progress.stage + 1}/${CHECKPOINTS.length} · ${CHECKPOINTS[progress.stage].label}`}
         </span>
         <span className={cn("zk-num text-[11px]", tone)}>
-          {readoutWindow(claim, progress)}
+          {readoutWindow(claim, now)}
         </span>
       </div>
 
@@ -101,10 +102,33 @@ export function CheckpointReadout({
   );
 }
 
-function readoutWindow(claim: Claim, progress: Progress): string {
-  if (progress.consumed !== null) {
-    return `${Math.round(progress.consumed * 100)}% of window`;
-  }
+/**
+ * The meter's caption. "46% of window" is analyst shorthand — it names a
+ * denominator nobody was asked to pick. What a reader actually wants is the
+ * date and whether the agent will make it, so the caption says that in time,
+ * and the meter keeps the share for anyone who wants it as a shape.
+ */
+function readoutWindow(claim: Claim, now: number): string {
+  if (!claim.deadline) return "no due date";
+  /* An offer's clock belongs to the owner, not the agent, so it counts down to
+     an answer rather than to a delivery. */
+  if (claim.status === "offered" || claim.status === "expired") {
+    const diff = claim.deadline - now;
 
-  return claim.deadline ? "window closed" : "no due date";
+    return diff < 0 ? "offer expired" : `${formatDuration(diff)} left to answer`;
+  }
+  if (claim.status === "completed") {
+    const margin = claim.deadline - claim.updatedAt;
+
+    return margin >= 0
+      ? `landed ${formatDuration(margin)} early`
+      : `landed ${formatDuration(-margin)} late`;
+  }
+  if (claim.status === "released") return "released at the due date";
+
+  const diff = claim.deadline - now;
+
+  return diff < 0
+    ? `${formatDuration(-diff)} past the due date`
+    : `${formatDuration(diff)} left on the due date`;
 }
